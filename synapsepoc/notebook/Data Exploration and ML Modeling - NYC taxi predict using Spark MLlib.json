@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6ebd6a40-c10c-4f04-b8ee-c1890f64b643"
+				"spark.autotune.trackingId": "6d47046d-7aaa-419c-a9f2-2a177a1ee1f3"
 			}
 		},
 		"metadata": {
@@ -79,7 +79,7 @@
 					"from pyspark.mllib.evaluation import BinaryClassificationMetrics\n",
 					"from pyspark.ml.evaluation import BinaryClassificationEvaluator"
 				],
-				"execution_count": 10
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -104,7 +104,7 @@
 					"nyc_tlc = NycTlcYellow(start_date=start_date, end_date=end_date)\n",
 					"nyc_tlc_df = nyc_tlc.to_spark_dataframe()"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +112,7 @@
 					"#To make development easier, faster and less expensive downsample for now\n",
 					"sampled_taxi_df = nyc_tlc_df.sample(True, 0.001, seed=1234)"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -153,7 +153,7 @@
 					"plt.suptitle('')\n",
 					"plt.show()"
 				],
-				"execution_count": 8
+				"execution_count": 14
 			},
 			{
 				"cell_type": "markdown",

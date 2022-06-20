@@ -2,7 +2,7 @@
 	"name": "Explore_DataLake_Amount",
 	"properties": {
 		"content": {
-			"query": "-- This is auto-generated code\nSELECT\n    vendor_id, pickup_datetime, sum(total_amount) \"total_vendor_amount\"\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE   \n    ) AS [result]\nGroup by vendor_id, pickup_datetime\norder by pickup_datetime",
+			"query": "-- This is auto-generated code\nSELECT\n    vendor_id, pickup_datetime, sum(total_amount) \"total_vendor_amount\"\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE   \n    ) AS [result]\nGroup by vendor_id, pickup_datetime\norder by pickup_datetime\n\nSELECT \nmin(tip_amount) \"Min\", max(tip_amount) \"Max\", avg(tip_amount) \"Average\"\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE   \n    ) AS [result]\n",
 			"metadata": {
 				"language": "sql"
 			},
