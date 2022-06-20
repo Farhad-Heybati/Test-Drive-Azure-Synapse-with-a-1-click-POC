@@ -1677,12 +1677,32 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Explore_DataLake')]",
+			"name": "[concat(parameters('workspaceName'), '/Explore_DataLake_Trip')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "-- This is auto-generated code\nSELECT *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS [result]\n    WHERE result.trip_distance > 0\n    --WHERE  pickup_datetime >= '2013-01-01' and pickup_datetime < '2013-01-08' \n    Order By pickup_datetime Asc",
+					"query": "-- This is auto-generated code\nSELECT *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS [result]\n    WHERE result.trip_distance > 0 AND\n    medallion = '059A0953850A7AB184964FA36C1B0C6B'\n    --WHERE  pickup_datetime >= '2013-01-01' and pickup_datetime < '2013-01-08' \n    Order By pickup_datetime Asc",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Explore_DataLake_Trip')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n",
 					"metadata": {
 						"language": "sql"
 					},
