@@ -1692,7 +1692,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "86cc1f7b-e85c-48b0-899a-d96f03fdca25"
+						"spark.autotune.trackingId": "1fd1cadd-fbef-4315-914d-1c5655253ac2"
 					}
 				},
 				"metadata": {
@@ -1741,7 +1741,7 @@
 							"display(df_trip.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 18
 					},
 					{
 						"cell_type": "code",
@@ -1760,7 +1760,7 @@
 							"df_trip.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 12
+						"execution_count": 19
 					},
 					{
 						"cell_type": "code",
@@ -1779,7 +1779,7 @@
 							"df_trip_clean = df_trip[(df_trip['trip_time_in_secs'] > 0) & (df_trip['pickup_longitude'] != 0)]"
 						],
 						"outputs": [],
-						"execution_count": 13
+						"execution_count": 20
 					},
 					{
 						"cell_type": "code",
@@ -1808,7 +1808,7 @@
 							"display(df_fares.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 21
 					},
 					{
 						"cell_type": "code",
@@ -1827,7 +1827,7 @@
 							"df_fares.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 15
+						"execution_count": 22
 					},
 					{
 						"cell_type": "code",
@@ -1865,7 +1865,7 @@
 							"'''"
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 23
 					},
 					{
 						"cell_type": "code",
@@ -1885,10 +1885,10 @@
 							"\r\n",
 							"df_fares_pandas = df_fares.toPandas()\r\n",
 							"df_trip_pandas = df_trip.toPandas()\r\n",
-							"result = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])"
+							"merge_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])"
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 27
 					},
 					{
 						"cell_type": "code",
@@ -1904,7 +1904,51 @@
 							}
 						},
 						"source": [
-							"result."
+							"merge_df.head(5)"
+						],
+						"outputs": [],
+						"execution_count": 28
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# How many passengers tip'd by various amounts\r\n",
+							"ax2 = merge_df.boxplot(column=['tip_amount'], by=['passenger_count'])\r\n",
+							"ax2.set_title('Tip amount by Passenger count')\r\n",
+							"ax2.set_xlabel('Passenger count') \r\n",
+							"ax2.set_ylabel('Tip Amount ($)')\r\n",
+							"plt.suptitle('')\r\n",
+							"plt.show()"
+						],
+						"outputs": [],
+						"execution_count": 30
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -1955,6 +1999,26 @@
 			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Explore with Dedicated Pool')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT TOP (100) [medallion]\n,[hack_license]\n,[vendor_id]\n,[pickup_datetime]\n,[payment_type]\n,[fare_amount]\n,[surcharge]\n,[mta_tax]\n,[tip_amount]\n,[tolls_amount]\n,[total_amount]\n FROM [dbo].[FaresData]\n\n\n\n-- explore \nSELECT TOP (100) [medallion]\n,[hack_license]\n,[vendor_id]\n,[rate_code]\n,[store_and_fwd_flag]\n,[pickup_datetime]\n,[dropoff_datetime]\n,[passenger_count]\n,[trip_time_in_secs]\n,[trip_distance]\n,[pickup_longitude]\n,[pickup_latitude]\n,[dropoff_longitude]\n,[dropoff_latitude]\n FROM [dbo].[TripsData]\n\n select ",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "eliszdel7xj7vkkkkpocws1p1",
+						"poolName": "eliszdel7xj7vkkkkpocws1p1"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
 			"dependsOn": []
 		}
 	]
