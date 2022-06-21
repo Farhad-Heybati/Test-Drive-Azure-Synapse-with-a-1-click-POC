@@ -1376,7 +1376,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9fece8be-b353-47c2-93d3-743480f53f90"
+						"spark.autotune.trackingId": "0b4524d6-1599-4dd4-b29d-a33f20bf7cc5"
 					}
 				},
 				"metadata": {
@@ -1692,7 +1692,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Explore-')]",
+			"name": "[concat(parameters('workspaceName'), '/Spark_Explore_data')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1712,7 +1712,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1e0ff636-926e-4397-8c2e-a02eec031d2e"
+						"spark.autotune.trackingId": "91be26bc-9277-4ca0-bc25-8828eacc8fa7"
 					}
 				},
 				"metadata": {
@@ -1737,7 +1737,8 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112
+						"memory": 112,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
