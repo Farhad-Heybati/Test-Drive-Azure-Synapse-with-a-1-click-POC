@@ -1,5 +1,5 @@
 {
-	"name": "Explore_DataLake_Trip",
+	"name": "Serverless_Explore_DataLake_Trip",
 	"properties": {
 		"content": {
 			"query": "-- This is auto-generated code\nSELECT top 200 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS [result]\n    WHERE result.trip_distance > 0 AND\n    trip_time_in_secs  > 0 AND\n    pickup_longitude != 0\n    --WHERE  pickup_datetime >= '2013-01-01' and pickup_datetime < '2013-01-08' \n    Order By pickup_datetime Asc",
