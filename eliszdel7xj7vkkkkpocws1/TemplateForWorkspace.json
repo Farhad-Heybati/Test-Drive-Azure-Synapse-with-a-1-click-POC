@@ -1712,7 +1712,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7ffbed11-eace-4459-81cb-3a2cbcaaee98"
+						"spark.autotune.trackingId": "83eefa44-e2e4-43e2-a98f-305c016e5f8b"
 					}
 				},
 				"metadata": {
@@ -1775,15 +1775,15 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
-							"df = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv', \r\n",
+							"df = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv, \r\n",
 							"format='csv',\r\n",
 							"inferSchema='True',\r\n",
 							"header=True\r\n",
-							").toDF(\"Sale_Key\",\"City_Key\",\"Customer_Key\",\"Bill_To_Customer_Key\",\"Stock_Item_Key\",\"Invoice_Date_Key\",\"Delivery_Date_Key\",\"Salesperson_Key\",\"WWI_Invoice_ID\",\"Description\",\"Package\",\"Quantity\",\"Unit_Price\",\"Tax_Rate\",\"Total_Excluding_Tax\",\"Tax_Amount\",\"Profit\",\"Total_Including_Tax\",\"Total_Dry_Items\",\"Total_Chiller_Items\",\"Lineage_Key\")\r\n",
-							"df.write.mode(\"overwrite\").saveAsTable(\"sales.factsalebig1\")"
+							")\r\n",
+							"df.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -1803,35 +1803,15 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
-							"df = spark.read.load('abfss://dev@mdwhohdatalake.dfs.core.windows.net/bronze/wwi-factsale-big-1.csv', \r\n",
+							"df = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
 							"format='csv',\r\n",
-							"#inferSchema='True',\r\n",
-							"delimiter='|',\r\n",
+							"inferSchema='True',\r\n",
 							"header=True\r\n",
-							").toDF(\"Sale_Key\",\"City_Key\",\"Customer_Key\",\"Bill_To_Customer_Key\",\"Stock_Item_Key\",\"Invoice_Date_Key\",\"Delivery_Date_Key\",\"Salesperson_Key\",\"WWI_Invoice_ID\",\"Description\",\"Package\",\"Quantity\",\"Unit_Price\",\"Tax_Rate\",\"Total_Excluding_Tax\",\"Tax_Amount\",\"Profit\",\"Total_Including_Tax\",\"Total_Dry_Items\",\"Total_Chiller_Items\",\"Lineage_Key\")\r\n",
-							"df.write.format(\"delta\").mode(\"overwrite\").saveAsTable(\"sales.factsalebigA\")"
+							")\r\n",
+							"df.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
 						],
 						"outputs": [],
-						"execution_count": 2
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"df.printSchema()"
-						],
-						"outputs": [],
-						"execution_count": 17
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
