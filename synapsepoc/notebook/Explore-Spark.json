@@ -1,5 +1,5 @@
 {
-	"name": "Notebook 1",
+	"name": "Explore-Spark",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b9044c60-2961-44ef-baf5-072a4f6274ea"
+				"spark.autotune.trackingId": "ed66b76d-681d-4943-9585-b6efafcea66f"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					")\r\n",
 					"display(df_trip.limit(10))"
 				],
-				"execution_count": 2
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -83,7 +83,7 @@
 				"source": [
 					"df_trip.printSchema()"
 				],
-				"execution_count": 3
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -102,6 +102,88 @@
 					"df_trip_clean = df_trip[(df_trip['trip_time_in_secs'] > 0) & (df_trip['pickup_longitude'] != 0)]"
 				],
 				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', format='csv'\r\n",
+					"## If header exists uncomment line below\r\n",
+					", header=True\r\n",
+					",inferSchema = True\r\n",
+					")\r\n",
+					"display(df_fares.limit(10))"
+				],
+				"execution_count": 28
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_fares.printSchema()"
+				],
+				"execution_count": 29
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import matplotlib.pyplot as plt\r\n",
+					"\r\n",
+					"# Look at tips by amount count histogram\r\n",
+					"df_fares_pandas = df_fares.toPandas()\r\n",
+					"\r\n",
+					"ax1 = df_fares_pandas['tip_amount'].plot(kind='hist', bins=25, facecolor='lightblue')\r\n",
+					"ax1.set_title('Tip amount distribution')\r\n",
+					"ax1.set_xlabel('Tip Amount ($)')\r\n",
+					"ax1.set_ylabel('Counts')\r\n",
+					"plt.suptitle('')\r\n",
+					"plt.show()\r\n",
+					"\r\n",
+					"# How many passengers tip'd by various amounts\r\n",
+					"ax2 = sampled_taxi_pd_df.boxplot(column=['tipAmount'], by=['passengerCount'])\r\n",
+					"ax2.set_title('Tip amount by Passenger count')\r\n",
+					"ax2.set_xlabel('Passenger count') \r\n",
+					"ax2.set_ylabel('Tip Amount ($)')\r\n",
+					"plt.suptitle('')\r\n",
+					"plt.show()"
+				],
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
