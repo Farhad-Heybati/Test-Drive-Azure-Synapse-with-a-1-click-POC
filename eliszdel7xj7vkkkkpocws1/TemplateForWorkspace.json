@@ -1296,7 +1296,27 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Explore_DataLake_Amount')]",
+			"name": "[concat(parameters('workspaceName'), '/Explore with Dedicated Pool')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT TOP (100) [medallion]\n,[hack_license]\n,[vendor_id]\n,[pickup_datetime]\n,[payment_type]\n,[fare_amount]\n,[surcharge]\n,[mta_tax]\n,[tip_amount]\n,[tolls_amount]\n,[total_amount]\n FROM [dbo].[FaresData]\n\n\n\n-- explore \nSELECT TOP (100) [medallion]\n,[hack_license]\n,[vendor_id]\n,[rate_code]\n,[store_and_fwd_flag]\n,[pickup_datetime]\n,[dropoff_datetime]\n,[passenger_count]\n,[trip_time_in_secs]\n,[trip_distance]\n,[pickup_longitude]\n,[pickup_latitude]\n,[dropoff_longitude]\n,[dropoff_latitude]\n FROM [dbo].[TripsData]\n\n select ",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "eliszdel7xj7vkkkkpocws1p1",
+						"poolName": "eliszdel7xj7vkkkkpocws1p1"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Serverless_Explore_DataLake_Amount')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1316,7 +1336,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Explore_DataLake_Trip')]",
+			"name": "[concat(parameters('workspaceName'), '/Serverless_Explore_DataLake_Trip')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1356,7 +1376,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "071a9fe3-dc52-49d9-8486-e5c7b4b89169"
+						"spark.autotune.trackingId": "9fece8be-b353-47c2-93d3-743480f53f90"
 					}
 				},
 				"metadata": {
@@ -1528,7 +1548,7 @@
 							"                                )"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": 6
 					},
 					{
 						"cell_type": "markdown",
@@ -1555,7 +1575,7 @@
 							"                                       .filter((taxi_df.tripTimeSecs >= 30) & (taxi_df.tripTimeSecs <= 7200))"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 7
 					},
 					{
 						"cell_type": "markdown",
@@ -1583,7 +1603,7 @@
 							"encoded_final_df = Pipeline(stages=[sI1, en1, sI2, en2]).fit(taxi_featurised_df).transform(taxi_featurised_df)"
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": 8
 					},
 					{
 						"cell_type": "markdown",
@@ -1605,7 +1625,7 @@
 							"train_data_df, test_data_df = encoded_final_df.randomSplit([trainingFraction, testingFraction], seed=seed)"
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": 9
 					},
 					{
 						"cell_type": "markdown",
@@ -1640,7 +1660,7 @@
 							"print(\"Area under ROC = %s\" % metrics.areaUnderROC)"
 						],
 						"outputs": [],
-						"execution_count": 10
+						"execution_count": 11
 					},
 					{
 						"cell_type": "markdown",
@@ -1665,14 +1685,14 @@
 							"plt.show()"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 12
 					}
 				]
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Explore-Spark')]",
+			"name": "[concat(parameters('workspaceName'), '/Explore-')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1692,7 +1712,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1fd1cadd-fbef-4315-914d-1c5655253ac2"
+						"spark.autotune.trackingId": "1e0ff636-926e-4397-8c2e-a02eec031d2e"
 					}
 				},
 				"metadata": {
@@ -1717,8 +1737,7 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112,
-						"automaticScaleJobs": false
+						"memory": 112
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1741,7 +1760,7 @@
 							"display(df_trip.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 32
 					},
 					{
 						"cell_type": "code",
@@ -1760,7 +1779,7 @@
 							"df_trip.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": 33
 					},
 					{
 						"cell_type": "code",
@@ -1999,26 +2018,6 @@
 			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Explore with Dedicated Pool')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT TOP (100) [medallion]\n,[hack_license]\n,[vendor_id]\n,[pickup_datetime]\n,[payment_type]\n,[fare_amount]\n,[surcharge]\n,[mta_tax]\n,[tip_amount]\n,[tolls_amount]\n,[total_amount]\n FROM [dbo].[FaresData]\n\n\n\n-- explore \nSELECT TOP (100) [medallion]\n,[hack_license]\n,[vendor_id]\n,[rate_code]\n,[store_and_fwd_flag]\n,[pickup_datetime]\n,[dropoff_datetime]\n,[passenger_count]\n,[trip_time_in_secs]\n,[trip_distance]\n,[pickup_longitude]\n,[pickup_latitude]\n,[dropoff_longitude]\n,[dropoff_latitude]\n FROM [dbo].[TripsData]\n\n select ",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "eliszdel7xj7vkkkkpocws1p1",
-						"poolName": "eliszdel7xj7vkkkkpocws1p1"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
 			"dependsOn": []
 		}
 	]
