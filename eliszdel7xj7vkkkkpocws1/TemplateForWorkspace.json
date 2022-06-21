@@ -1356,7 +1356,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "3103d9f2-90aa-4d93-9f87-2a6fca585de1"
+						"spark.autotune.trackingId": "071a9fe3-dc52-49d9-8486-e5c7b4b89169"
 					}
 				},
 				"metadata": {
@@ -1418,7 +1418,7 @@
 							"from pyspark.ml.evaluation import BinaryClassificationEvaluator"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 2
 					},
 					{
 						"cell_type": "markdown",
@@ -1444,7 +1444,7 @@
 							"nyc_tlc_df = nyc_tlc.to_spark_dataframe()"
 						],
 						"outputs": [],
-						"execution_count": 12
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -1453,7 +1453,7 @@
 							"sampled_taxi_df = nyc_tlc_df.sample(True, 0.001, seed=1234)"
 						],
 						"outputs": [],
-						"execution_count": 13
+						"execution_count": 4
 					},
 					{
 						"cell_type": "markdown",
@@ -1495,7 +1495,7 @@
 							"plt.show()"
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 5
 					},
 					{
 						"cell_type": "markdown",
@@ -1672,7 +1672,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"name": "[concat(parameters('workspaceName'), '/Explore-Spark')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1692,7 +1692,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "542d5f2d-c52c-4827-881e-8a857f7b59e7"
+						"spark.autotune.trackingId": "61bd7ac1-780f-4eb4-b0a9-068924f3d0d7"
 					}
 				},
 				"metadata": {
@@ -1741,7 +1741,7 @@
 							"display(df_trip.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 22
 					},
 					{
 						"cell_type": "code",
@@ -1760,7 +1760,7 @@
 							"df_trip.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 23
 					},
 					{
 						"cell_type": "code",
@@ -1780,6 +1780,91 @@
 						],
 						"outputs": [],
 						"execution_count": 17
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', format='csv'\r\n",
+							"## If header exists uncomment line below\r\n",
+							", header=True\r\n",
+							",inferSchema = True\r\n",
+							")\r\n",
+							"display(df_fares.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 28
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_fares.printSchema()"
+						],
+						"outputs": [],
+						"execution_count": 29
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import matplotlib.pyplot as plt\r\n",
+							"\r\n",
+							"# Look at tips by amount count histogram\r\n",
+							"df_fares_pandas = df_fares.toPandas()\r\n",
+							"\r\n",
+							"ax1 = df_fares_pandas['tip_amount'].plot(kind='hist', bins=25, facecolor='lightblue')\r\n",
+							"ax1.set_title('Tip amount distribution')\r\n",
+							"ax1.set_xlabel('Tip Amount ($)')\r\n",
+							"ax1.set_ylabel('Counts')\r\n",
+							"plt.suptitle('')\r\n",
+							"plt.show()\r\n",
+							"\r\n",
+							"# How many passengers tip'd by various amounts\r\n",
+							"ax2 = df_fares_pandas.boxplot(column=['tip_amount'], by=['passengerCount'])\r\n",
+							"ax2.set_title('Tip amount by Passenger count')\r\n",
+							"ax2.set_xlabel('Passenger count') \r\n",
+							"ax2.set_ylabel('Tip Amount ($)')\r\n",
+							"plt.suptitle('')\r\n",
+							"plt.show()"
+						],
+						"outputs": [],
+						"execution_count": 32
 					},
 					{
 						"cell_type": "code",
