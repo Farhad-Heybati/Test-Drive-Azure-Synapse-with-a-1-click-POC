@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ed66b76d-681d-4943-9585-b6efafcea66f"
+				"spark.autotune.trackingId": "9b1c3a04-3568-4fa1-aea9-4bbf02ba959f"
 			}
 		},
 		"metadata": {
@@ -176,7 +176,7 @@
 					"plt.show()\r\n",
 					"\r\n",
 					"# How many passengers tip'd by various amounts\r\n",
-					"ax2 = sampled_taxi_pd_df.boxplot(column=['tipAmount'], by=['passengerCount'])\r\n",
+					"ax2 = df_fares_pandas.boxplot(column=['tip_amount'], by=['passengerCount'])\r\n",
 					"ax2.set_title('Tip amount by Passenger count')\r\n",
 					"ax2.set_xlabel('Passenger count') \r\n",
 					"ax2.set_ylabel('Tip Amount ($)')\r\n",
