@@ -1692,7 +1692,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "61bd7ac1-780f-4eb4-b0a9-068924f3d0d7"
+						"spark.autotune.trackingId": "c53eafff-f9da-4696-9cd9-e487f5422bcb"
 					}
 				},
 				"metadata": {
@@ -1741,7 +1741,7 @@
 							"display(df_trip.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 22
+						"execution_count": 11
 					},
 					{
 						"cell_type": "code",
@@ -1760,7 +1760,7 @@
 							"df_trip.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 12
 					},
 					{
 						"cell_type": "code",
@@ -1779,7 +1779,7 @@
 							"df_trip_clean = df_trip[(df_trip['trip_time_in_secs'] > 0) & (df_trip['pickup_longitude'] != 0)]"
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 13
 					},
 					{
 						"cell_type": "code",
@@ -1808,7 +1808,7 @@
 							"display(df_fares.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 28
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
@@ -1827,7 +1827,7 @@
 							"df_fares.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 29
+						"execution_count": 15
 					},
 					{
 						"cell_type": "code",
@@ -1854,17 +1854,18 @@
 							"ax1.set_ylabel('Counts')\r\n",
 							"plt.suptitle('')\r\n",
 							"plt.show()\r\n",
-							"\r\n",
+							"'''\r\n",
 							"# How many passengers tip'd by various amounts\r\n",
 							"ax2 = df_fares_pandas.boxplot(column=['tip_amount'], by=['passengerCount'])\r\n",
 							"ax2.set_title('Tip amount by Passenger count')\r\n",
 							"ax2.set_xlabel('Passenger count') \r\n",
 							"ax2.set_ylabel('Tip Amount ($)')\r\n",
 							"plt.suptitle('')\r\n",
-							"plt.show()"
+							"plt.show()\r\n",
+							"'''"
 						],
 						"outputs": [],
-						"execution_count": 32
+						"execution_count": 16
 					},
 					{
 						"cell_type": "code",
@@ -1880,7 +1881,30 @@
 							}
 						},
 						"source": [
-							""
+							"import pandas as pd\r\n",
+							"\r\n",
+							"df_fares_pandas = df_fares.toPandas()\r\n",
+							"df_trip_pandas = df_trip.toPandas()\r\n",
+							"result = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])"
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"result."
 						],
 						"outputs": [],
 						"execution_count": null
