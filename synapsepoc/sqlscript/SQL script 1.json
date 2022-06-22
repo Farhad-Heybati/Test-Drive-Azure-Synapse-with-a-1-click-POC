@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t USE_TYPE_DEFAULT = FALSE\n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'public_eliszdel7xj7vkkkkpoc_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [public_eliszdel7xj7vkkkkpoc_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE tbl (\n\t[medallion] nvarchar(4000),\n\t[hack_license] nvarchar(4000),\n\t[vendor_id] nvarchar(4000),\n\t[rate_code] bigint,\n\t[store_and_fwd_flag] nvarchar(4000),\n\t[pickup_datetime] datetime2(0),\n\t[dropoff_datetime] datetime2(0),\n\t[passenger_count] bigint,\n\t[trip_time_in_secs] bigint,\n\t[trip_distance] float,\n\t[pickup_longitude] float,\n\t[pickup_latitude] float,\n\t[dropoff_longitude] float,\n\t[dropoff_latitude] float\n\t)\n\tWITH (\n\tLOCATION = 'trip-data.csv',\n\tDATA_SOURCE = [public_eliszdel7xj7vkkkkpoc_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\n\nSELECT TOP 100 * FROM external.tbl\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "DataExplorationDB",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
