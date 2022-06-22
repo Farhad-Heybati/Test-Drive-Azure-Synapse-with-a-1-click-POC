@@ -1321,12 +1321,12 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS [result]\n\n\nSELECT\n    vendor_id, pickup_datetime, sum(total_amount) \"total_vendor_amount\"\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE   \n    ) AS [result]\nGroup by vendor_id, pickup_datetime\norder by pickup_datetime\n\nSELECT \nmin(tip_amount) \"Min\", max(tip_amount) \"Max\", avg(tip_amount) \"Average\"\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE   \n    ) AS [result]\n",
+					"query": "-- This is auto-generated code\nSELECT\n    top 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE)\nWITH(\n    ) AS [result]\n\n\nSELECT\n    vendor_id, pickup_datetime, sum(total_amount) \"total_vendor_amount\"\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE   \n    ) AS [result]\nGroup by vendor_id, pickup_datetime\norder by pickup_datetime\n\nSELECT \nmin(tip_amount) \"Min\", max(tip_amount) \"Max\", avg(tip_amount) \"Average\"\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE   \n    ) AS [result]\n",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "DataExplorationDB",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -2170,7 +2170,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "CREATE DATABASE DataExplorationDB \n                COLLATE Latin1_General_100_BIN2_UTF8\n\ncreate view trip_vw as \nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n\n\ncreate view fares_vw as \nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n",
+					"query": "CREATE DATABASE DataExplorationDB \n                COLLATE Latin1_General_100_BIN2_UTF8\n\nDrop view trip_vw, fares_vw\n\ncreate view trip_vw as \nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \nWHERE\n    \nWITH(\n        [medallion] nvarchar(4000),\n        [hack_license] nvarchar(4000),\n        [vendor_id] nvarchar(4000),\n        [rate_code] bigint,\n        [store_and_fwd_flag] nvarchar(4000),\n        [pickup_datetime] datetime2(0),\n        [dropoff_datetime] datetime2(0),\n        [passenger_count] bigint,\n        [trip_time_in_secs] bigint,\n        [trip_distance] float,\n        [pickup_longitude] float,\n        [pickup_latitude] float,\n        [dropoff_longitude] float,\n        [dropoff_latitude] float\n    )AS [result]\n\n\n\ncreate view fares_vw as \nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        [medallion] nvarchar(4000),\n\t[hack_license] nvarchar(4000),\n\t[vendor_id] nvarchar(4000),\n\t[pickup_datetime] datetime2(0),\n\t[payment_type] nvarchar(4000),\n\t[fare_amount] float,\n\t[surcharge] float,\n\t[mta_tax] float,\n\t[tip_amount] float,\n\t[tolls_amount] float,\n\t[total_amount] float\n    )AS [result]\n\nselect * from fares_vw \n\n\n",
 					"metadata": {
 						"language": "sql"
 					},
