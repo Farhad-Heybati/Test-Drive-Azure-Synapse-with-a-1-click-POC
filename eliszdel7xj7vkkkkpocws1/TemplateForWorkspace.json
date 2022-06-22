@@ -1321,7 +1321,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "CREATE DATABASE DataExplorationDB \n                COLLATE Latin1_General_100_BIN2_UTF8\n\nDrop view trip_vw, fares_vw\n\ncreate view trip_vw as \nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n) \nWITH(\n        [medallion] nvarchar(4000),\n        [hack_license] nvarchar(4000),\n        [vendor_id] nvarchar(4000),\n        [rate_code] bigint,\n        [store_and_fwd_flag] nvarchar(4000),\n        [pickup_datetime] datetime2(0),\n        [dropoff_datetime] datetime2(0),\n        [passenger_count] bigint,\n        [trip_time_in_secs] bigint,\n        [trip_distance] float,\n        [pickup_longitude] float,\n        [pickup_latitude] float,\n        [dropoff_longitude] float,\n        [dropoff_latitude] float\n    )AS [result]\nWHERE\n    trip_distance > 0 AND\n    passenger_count > 0 AND\n    pickup_longitude != 0 AND\n    store_and_fwd_flag is not NULL\n\n\ncreate view fares_vw as \nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        [medallion] nvarchar(4000),\n\t[hack_license] nvarchar(4000),\n\t[vendor_id] nvarchar(4000),\n\t[pickup_datetime] datetime2(0),\n\t[payment_type] nvarchar(4000),\n\t[fare_amount] float,\n\t[surcharge] float,\n\t[mta_tax] float,\n\t[tip_amount] float,\n\t[tolls_amount] float,\n\t[total_amount] float\n    )AS [result]\n\nselect * from fares_vw \n\n\n",
+					"query": "CREATE DATABASE DataExplorationDB \n                COLLATE Latin1_General_100_BIN2_UTF8\n\nDrop view trip_vw, fares_vw\n\ncreate view trip_vw as \nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n) \nWITH(\n        [medallion] nvarchar(4000),\n        [hack_license] nvarchar(4000),\n        [vendor_id] nvarchar(4000),\n        [rate_code] bigint,\n        [store_and_fwd_flag] nvarchar(4000),\n        [pickup_datetime] datetime2(0),\n        [dropoff_datetime] datetime2(0),\n        [passenger_count] bigint,\n        [trip_time_in_secs] bigint,\n        [trip_distance] float,\n        [pickup_longitude] float,\n        [pickup_latitude] float,\n        [dropoff_longitude] float,\n        [dropoff_latitude] float\n    )AS [result]\nWHERE\n    trip_distance > 0 AND\n    passenger_count > 0 AND\n    pickup_longitude != 0 AND\n    store_and_fwd_flag is not NULL\n\n\ncreate view fares_vw as \nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        [medallion] nvarchar(4000),\n\t[hack_license] nvarchar(4000),\n\t[vendor_id] nvarchar(4000),\n\t[pickup_datetime] datetime2(0),\n\t[payment_type] nvarchar(4000),\n\t[fare_amount] float,\n\t[surcharge] float,\n\t[mta_tax] float,\n\t[tip_amount] float,\n\t[tolls_amount] float,\n\t[total_amount] float\n    )AS [result]\n    WHERE\n        total_amount > 0\n\nSELECT \n    f.medallion, f.hack_license, f.vendor_id, f.pickup_datetime, f.fare_amount, f.tip_amount, f.tolls_amount, total_amount,\n    t.dropoff_datetime, t.passenger_count, t.trip_time_in_secs, t.trip_distance, t.pickup_longitude, t.pickup_latitude,\n    t.dropoff_longitude,t.dropoff_latitude\nFROM \n    fares_vw f, trip_vw t \nWHERE \n    f.medallion = t.medallion AND\n    f.hack_license = t.hack_license AND\n    f.vendor_id = t.vendor_id AND\n    f.pickup_datetime = t.pickup_datetime\n\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1876,7 +1876,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a27daebb-10f2-4374-8bd0-1ab4101eb6e3"
+						"spark.autotune.trackingId": "9684b394-baec-4745-86ec-3198d1a5b60e"
 					}
 				},
 				"metadata": {
@@ -1901,7 +1901,8 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112
+						"memory": 112,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
