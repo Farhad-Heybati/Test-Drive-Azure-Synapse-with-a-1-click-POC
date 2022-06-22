@@ -2,7 +2,7 @@
 	"name": "Serverless_Database",
 	"properties": {
 		"content": {
-			"query": "CREATE DATABASE DataExplorationDB \n                COLLATE Latin1_General_100_BIN2_UTF8\n\n-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n\n\n    \n-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n",
+			"query": "CREATE DATABASE DataExplorationDB \n                COLLATE Latin1_General_100_BIN2_UTF8\n\ncreate view trip_vw as \nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/trip-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n\n\ncreate view fares_vw as \nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/public/fares-data.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n",
 			"metadata": {
 				"language": "sql"
 			},
