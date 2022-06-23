@@ -1,5 +1,5 @@
 {
-	"name": "1-Spark-Database",
+	"name": "1-Spark-Database-Delta",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "676ab174-e7d9-4b21-872b-c3d123c88b52"
+				"spark.autotune.trackingId": "2d2ed990-36a7-47b9-ba8f-66fe1fe78c65"
 			}
 		},
 		"metadata": {
