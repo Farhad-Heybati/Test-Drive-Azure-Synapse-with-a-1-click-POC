@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "767a8e76-e02a-4679-b530-ae0db6611545"
+				"spark.autotune.trackingId": "c961e81c-33c0-4726-9e61-893ed41b8822"
 			}
 		},
 		"metadata": {
@@ -130,6 +130,49 @@
 				},
 				"source": [
 					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql import functions as fn\r\n",
+					"quarters = 20\r\n",
+					"start_date = datetime(2012, 1, 1)\r\n",
+					"\r\n",
+					"wwi_sales2 = wwi_sales \\\r\n",
+					"        .withColumn(\"InvoiceYear\", fn.year(wwi_sales['InvoiceDateKey'])) \\\r\n",
+					"        .withColumn(\"InvoiceQuarter\", fn.quarter(wwi_sales['InvoiceDateKey'])) \\\r\n",
+					"\r\n",
+					"for quarter in np.arange(1, quarters + 1):\r\n",
+					"\r\n",
+					"    quarter_number = 4 if quarter % 4 == 0 else quarter % 4\r\n",
+					"    end_date = start_date + relativedelta(months=3) + relativedelta(days=-1)\r\n",
+					"    \r\n",
+					"    print(f'Exporting data for {start_date.year} Q{quarter_number} ({start_date:%Y-%m-%d} : {end_date:%Y-%m-%d}) ...')\r\n",
+					"\r\n",
+					"    storage_path_delta = f'abfss://wwi@synapseworkshopadls.dfs.core.windows.net/factsale-deltalake'\r\n",
+					"\r\n",
+					"    wwi_sales2 \\\r\n",
+					"        .where((wwi_sales['InvoiceDateKey'] >= f'{start_date:%Y-%m-%d}') & (wwi_sales['InvoiceDateKey'] <= f'{end_date:%Y-%m-%d}')) \\\r\n",
+					"        .write \\\r\n",
+					"        .format(\"delta\") \\\r\n",
+					"        .partitionBy('InvoiceYear', 'InvoiceQuarter', 'InvoiceDateKey') \\\r\n",
+					"        .mode(\"append\") \\\r\n",
+					"        .save(storage_path_delta)\r\n",
+					"\r\n",
+					"    start_date = end_date + relativedelta(days=1)"
 				],
 				"execution_count": null
 			}
