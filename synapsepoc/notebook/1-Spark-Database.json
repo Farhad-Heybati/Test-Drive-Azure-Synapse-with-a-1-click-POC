@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "83f6ff3f-4b1b-4b36-8378-d41d5d9f847c"
+				"spark.autotune.trackingId": "54a0798b-fd67-4a71-a9e3-e07b58897ff8"
 			}
 		},
 		"metadata": {
@@ -79,14 +79,14 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"df = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv, \r\n",
+					"df_trip = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv', \r\n",
 					"format='csv',\r\n",
 					"inferSchema='True',\r\n",
 					"header=True\r\n",
 					")\r\n",
-					"df.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
+					"df_trip.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -106,14 +106,14 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"df = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
+					"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
 					"format='csv',\r\n",
 					"inferSchema='True',\r\n",
 					"header=True\r\n",
 					")\r\n",
-					"df.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
+					"df_fares.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -133,7 +133,7 @@
 					"df_trip_pandas = df_trip.toPandas()\r\n",
 					"merge_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])"
 				],
-				"execution_count": 2
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
