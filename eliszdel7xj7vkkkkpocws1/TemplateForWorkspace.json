@@ -1396,7 +1396,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "fab737d7-a3e6-4eec-badc-debcdf7b8986"
+						"spark.autotune.trackingId": "b9d26049-a353-434d-b798-536da09ad6a0"
 					}
 				},
 				"metadata": {
@@ -1421,8 +1421,7 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112,
-						"automaticScaleJobs": false
+						"memory": 112
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1682,7 +1681,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "76ef9355-7f47-40a7-9f2d-f6344dfb9f16"
+						"spark.autotune.trackingId": "7803dcd4-06e1-4486-bd42-5dfeafc0c597"
 					}
 				},
 				"metadata": {
@@ -1725,7 +1724,7 @@
 							"spark.sql(\"CREATE DATABASE IF NOT EXISTS taxis\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -1745,15 +1744,15 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
-							"df = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv, \r\n",
+							"df_trip = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv', \r\n",
 							"format='csv',\r\n",
 							"inferSchema='True',\r\n",
 							"header=True\r\n",
 							")\r\n",
-							"df.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
+							"df_trip.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 11
 					},
 					{
 						"cell_type": "code",
@@ -1773,15 +1772,15 @@
 						},
 						"source": [
 							"%%pyspark\r\n",
-							"df = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
+							"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
 							"format='csv',\r\n",
 							"inferSchema='True',\r\n",
 							"header=True\r\n",
 							")\r\n",
-							"df.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
+							"df_fares.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 12
 					},
 					{
 						"cell_type": "code",
@@ -1797,12 +1796,16 @@
 							}
 						},
 						"source": [
+							"import pandas as pd\r\n",
+							"\r\n",
 							"df_fares_pandas = df_fares.toPandas()\r\n",
 							"df_trip_pandas = df_trip.toPandas()\r\n",
-							"merge_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])"
+							"merge_taxis_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])\r\n",
+							"#merge_taxis_df.dropna(inplace=True, axis=0)\r\n",
+							"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 26
 					},
 					{
 						"cell_type": "code",
@@ -1818,10 +1821,10 @@
 							}
 						},
 						"source": [
-							"merge_df_V2 = df_fares.unionByName(df_trip)"
+							"merge_taxis_df.head(5)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 27
 					},
 					{
 						"cell_type": "code",
@@ -1837,35 +1840,39 @@
 							}
 						},
 						"source": [
-							"from pyspark.sql import functions as fn\r\n",
-							"quarters = 20\r\n",
-							"start_date = datetime(2012, 1, 1)\r\n",
-							"\r\n",
-							"wwi_sales2 = wwi_sales \\\r\n",
-							"        .withColumn(\"InvoiceYear\", fn.year(wwi_sales['InvoiceDateKey'])) \\\r\n",
-							"        .withColumn(\"InvoiceQuarter\", fn.quarter(wwi_sales['InvoiceDateKey'])) \\\r\n",
-							"\r\n",
-							"for quarter in np.arange(1, quarters + 1):\r\n",
-							"\r\n",
-							"    quarter_number = 4 if quarter % 4 == 0 else quarter % 4\r\n",
-							"    end_date = start_date + relativedelta(months=3) + relativedelta(days=-1)\r\n",
-							"    \r\n",
-							"    print(f'Exporting data for {start_date.year} Q{quarter_number} ({start_date:%Y-%m-%d} : {end_date:%Y-%m-%d}) ...')\r\n",
-							"\r\n",
-							"    storage_path_delta = f'abfss://wwi@synapseworkshopadls.dfs.core.windows.net/factsale-deltalake'\r\n",
-							"\r\n",
-							"    wwi_sales2 \\\r\n",
-							"        .where((wwi_sales['InvoiceDateKey'] >= f'{start_date:%Y-%m-%d}') & (wwi_sales['InvoiceDateKey'] <= f'{end_date:%Y-%m-%d}')) \\\r\n",
-							"        .write \\\r\n",
-							"        .format(\"delta\") \\\r\n",
-							"        .partitionBy('InvoiceYear', 'InvoiceQuarter', 'InvoiceDateKey') \\\r\n",
-							"        .mode(\"append\") \\\r\n",
-							"        .save(storage_path_delta)\r\n",
-							"\r\n",
-							"    start_date = end_date + relativedelta(days=1)"
+							"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
+							"merge_taxis_spark_df.head(5)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 32
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"storage_path_delta = f'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/taxis-deltalake'\r\n",
+							"\r\n",
+							"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
+							"merge_taxis_spark_df \\\r\n",
+							".where((merge_taxis_spark_df['passenger_count'] >= 1) & (merge_taxis_spark_df['pickup_latitude'] != 0)& (merge_taxis_spark_df['total_amount'] > 0)) \\\r\n",
+							".write \\\r\n",
+							".format(\"delta\") \\\r\n",
+							".partitionBy('vendor_id', 'hack_license', 'medallion') \\\r\n",
+							".mode(\"append\") \\\r\n",
+							".save(storage_path_delta)"
+						],
+						"outputs": [],
+						"execution_count": 33
 					}
 				]
 			},
