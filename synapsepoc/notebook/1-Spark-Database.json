@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "54a0798b-fd67-4a71-a9e3-e07b58897ff8"
+				"spark.autotune.trackingId": "1d042eee-071d-47b5-8073-b05233a40723"
 			}
 		},
 		"metadata": {
@@ -59,7 +59,7 @@
 					"%%pyspark\r\n",
 					"spark.sql(\"CREATE DATABASE IF NOT EXISTS taxis\")"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -86,7 +86,7 @@
 					")\r\n",
 					"df_trip.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
 				],
-				"execution_count": 6
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -113,7 +113,7 @@
 					")\r\n",
 					"df_fares.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
 				],
-				"execution_count": 7
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -129,11 +129,13 @@
 					}
 				},
 				"source": [
+					"import pandas as pd\r\n",
+					"\r\n",
 					"df_fares_pandas = df_fares.toPandas()\r\n",
 					"df_trip_pandas = df_trip.toPandas()\r\n",
 					"merge_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])"
 				],
-				"execution_count": 9
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
