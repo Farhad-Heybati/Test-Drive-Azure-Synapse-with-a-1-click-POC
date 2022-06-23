@@ -1,5 +1,5 @@
 {
-	"name": "Data Exploration and ML Modeling - NYC taxi predict using Spark MLlib",
+	"name": "2-Data Exploration and ML Modeling - NYC taxi predict using Spark MLlib",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f1a484b4-3e8d-4ceb-a137-3bae141f68e5"
+				"spark.autotune.trackingId": "37970b08-210c-4a99-a756-ddf13dc12731"
 			}
 		},
 		"metadata": {
