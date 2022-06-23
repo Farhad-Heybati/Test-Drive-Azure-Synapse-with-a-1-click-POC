@@ -1396,7 +1396,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b9d26049-a353-434d-b798-536da09ad6a0"
+						"spark.autotune.trackingId": "fab737d7-a3e6-4eec-badc-debcdf7b8986"
 					}
 				},
 				"metadata": {
@@ -1421,7 +1421,8 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112
+						"memory": 112,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1681,7 +1682,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "efc12e52-c196-4b8f-ae42-b0c830ca93fb"
+						"spark.autotune.trackingId": "76ef9355-7f47-40a7-9f2d-f6344dfb9f16"
 					}
 				},
 				"metadata": {
@@ -1724,7 +1725,7 @@
 							"spark.sql(\"CREATE DATABASE IF NOT EXISTS taxis\")"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1752,7 +1753,7 @@
 							"df.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1780,7 +1781,7 @@
 							"df.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
 						],
 						"outputs": [],
-						"execution_count": 10
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1796,7 +1797,28 @@
 							}
 						},
 						"source": [
-							""
+							"df_fares_pandas = df_fares.toPandas()\r\n",
+							"df_trip_pandas = df_trip.toPandas()\r\n",
+							"merge_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"merge_df_V2 = df_fares.unionByName(df_trip)"
 						],
 						"outputs": [],
 						"execution_count": null
