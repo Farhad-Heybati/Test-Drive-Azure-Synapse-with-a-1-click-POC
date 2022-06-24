@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "777edf51-408b-4725-8d61-04b453694c61"
+				"spark.autotune.trackingId": "3e48b9d7-a136-4a13-8572-d35821a6bebe"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -89,7 +89,7 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -111,9 +111,11 @@
 					"df_trip_pandas = df_trip.toPandas()\r\n",
 					"merge_taxis_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])\r\n",
 					"#merge_taxis_df.dropna(inplace=True, axis=0)\r\n",
-					"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']"
+					"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']\r\n",
+					"\r\n",
+					"merge_taxis_df.head(1)"
 				],
-				"execution_count": null
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -126,69 +128,16 @@
 						"transient": {
 							"deleting": false
 						}
-					},
-					"microsoft": {
-						"language": "sparksql"
 					}
 				},
 				"source": [
-					"%%sql\r\n",
-					"-- Create Delta Lake table, define schema and location\r\n",
-					"CREATE TABLE DELTA_Employees (\r\n",
-					"  Employee STRING NOT NULL,\r\n",
-					"  Salary INT NOT NULL,\r\n",
-					"  BeginDate DATE NOT NULL,\r\n",
-					"  EndDate DATE NOT NULL,\r\n",
-					"  CurrentRecord INT NOT NULL \r\n",
-					")\r\n",
-					"USING DELTA\r\n",
-					"-- specify data lake folder location\r\n",
-					"LOCATION '/taxis/Employees/' "
+					"delta_table_path = 'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/Delta_Demo'\r\n",
+					"\r\n",
+					"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
+					"dr\r\n",
+					"merge_taxis_spark_df.write.format(\"delta\").partitionBy(\"Col3\")save(delta_table_path)"
 				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					},
-					"microsoft": {
-						"language": "sparksql"
-					}
-				},
-				"source": [
-					"%%sql\r\n",
-					"-- Create Delta Lake table, define schema and location\r\n",
-					"CREATE TABLE merge_taxi_delta (\r\n",
-					"\tmedallion nvarchar(4000),\r\n",
-					"\t[hack_license] nvarchar(4000),\r\n",
-					"\t[vendor_id] nvarchar(4000),\r\n",
-					"\t[pickup_datetime] datetime2(7),\r\n",
-					"\t[fare_amount] float,\r\n",
-					"\t[tip_amount] float,\r\n",
-					"\t[tolls_amount] float,\r\n",
-					"\t[total_amount] float,\r\n",
-					"\t[dropoff_datetime] datetime2(7),\r\n",
-					"\t[passenger_count] bigint,\r\n",
-					"\t[trip_time_in_secs] bigint,\r\n",
-					"\t[trip_distance] float,\r\n",
-					"\t[pickup_longitude] float,\r\n",
-					"\tpickup_latitude float,\r\n",
-					"\tdropoff_longitude float,\r\n",
-					"\tdropoff_latitude float\r\n",
-					")\r\n",
-					"USING DELTA\r\n",
-					"-- specify data lake folder location\r\n",
-					"LOCATION '/taxis/clean_data/' "
-				],
-				"execution_count": null
+				"execution_count": 34
 			}
 		]
 	}
