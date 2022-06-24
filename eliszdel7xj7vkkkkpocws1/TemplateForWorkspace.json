@@ -1721,7 +1721,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "adbe48d5-7679-4abf-b320-06bd1c0ccf15"
+						"spark.autotune.trackingId": "958e0c40-46e9-4dc3-879c-74aa7a0ba78d"
 					}
 				},
 				"metadata": {
@@ -1764,7 +1764,7 @@
 							"spark.sql(\"CREATE DATABASE IF NOT EXISTS taxis\")"
 						],
 						"outputs": [],
-						"execution_count": 10
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -1792,7 +1792,7 @@
 							"df_trip.write.mode(\"overwrite\").saveAsTable(\"taxis.trip\")"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -1820,7 +1820,26 @@
 							"df_fares.write.mode(\"overwrite\").saveAsTable(\"taxis.fares\")"
 						],
 						"outputs": [],
-						"execution_count": 12
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"type(df_fares)"
+						],
+						"outputs": [],
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -1845,64 +1864,7 @@
 							"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']"
 						],
 						"outputs": [],
-						"execution_count": 26
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"df_trip.head(5)"
-						],
-						"outputs": [],
-						"execution_count": 48
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"df_trip[(df_trip['vendor_id']=='VTS') & (df_trip['store_and_fwd_flag'] !='null')].head(10)"
-						],
-						"outputs": [],
-						"execution_count": 49
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"df_trip.select('store_and_fwd_flag').where (df_trip['vendor_id'] == 'VTS')"
-						],
-						"outputs": [],
-						"execution_count": 52
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -1919,10 +1881,30 @@
 						},
 						"source": [
 							"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
-							"merge_taxis_spark_df.head(5)"
+							"merge_taxis_spark_df.head(5)\r\n",
+							""
 						],
 						"outputs": [],
-						"execution_count": 32
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"merge_taxis_spark_df.write.mode(\"overwrite\").saveAsTable(\"taxis.merge_taxis\")"
+						],
+						"outputs": [],
+						"execution_count": 13
 					},
 					{
 						"cell_type": "code",
@@ -2416,7 +2398,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "08e7d3f5-44a4-44f3-ab58-acb0171c0014"
+						"spark.autotune.trackingId": "843e3e24-7b12-4a7c-bc76-2e813b95555f"
 					}
 				},
 				"metadata": {
@@ -2463,7 +2445,7 @@
 							")"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2490,7 +2472,7 @@
 							")"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2515,26 +2497,7 @@
 							"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']"
 						],
 						"outputs": [],
-						"execution_count": 7
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"merge_taxis_df.info()"
-						],
-						"outputs": [],
-						"execution_count": 8
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2564,7 +2527,143 @@
 							")\r\n",
 							"USING DELTA\r\n",
 							"-- specify data lake folder location\r\n",
-							"LOCATION '/taxi/clean_data/' "
+							"LOCATION '/taxis/Employees/' "
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							}
+						},
+						"source": [
+							"%%sql\r\n",
+							"-- Create Delta Lake table, define schema and location\r\n",
+							"CREATE TABLE merge_taxi_delta (\r\n",
+							"\tmedallion nvarchar(4000),\r\n",
+							"\t[hack_license] nvarchar(4000),\r\n",
+							"\t[vendor_id] nvarchar(4000),\r\n",
+							"\t[pickup_datetime] datetime2(7),\r\n",
+							"\t[fare_amount] float,\r\n",
+							"\t[tip_amount] float,\r\n",
+							"\t[tolls_amount] float,\r\n",
+							"\t[total_amount] float,\r\n",
+							"\t[dropoff_datetime] datetime2(7),\r\n",
+							"\t[passenger_count] bigint,\r\n",
+							"\t[trip_time_in_secs] bigint,\r\n",
+							"\t[trip_distance] float,\r\n",
+							"\t[pickup_longitude] float,\r\n",
+							"\tpickup_latitude float,\r\n",
+							"\tdropoff_longitude float,\r\n",
+							"\tdropoff_latitude float\r\n",
+							")\r\n",
+							"USING DELTA\r\n",
+							"-- specify data lake folder location\r\n",
+							"LOCATION '/taxis/clean_data/' "
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "ws1sparkpool1",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "aa249469-b109-4733-b08d-ecba13e156c4"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/281e4630-88bb-4464-b35f-af54cdd4252d/resourceGroups/Synapse-1-click-RG/providers/Microsoft.Synapse/workspaces/eliszdel7xj7vkkkkpocws1/bigDataPools/ws1sparkpool1",
+						"name": "ws1sparkpool1",
+						"type": "Spark",
+						"endpoint": "https://eliszdel7xj7vkkkkpocws1.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ws1sparkpool1",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 5,
+						"cores": 16,
+						"memory": 112,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\n",
+							"df = spark.sql(\"SELECT * FROM `taxis`.`merge_taxis`\")\n",
+							"# df.show(10)\n",
+							"\n",
+							"df.info()"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
 						],
 						"outputs": [],
 						"execution_count": null
