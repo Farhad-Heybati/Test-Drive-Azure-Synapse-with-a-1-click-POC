@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2d2ed990-36a7-47b9-ba8f-66fe1fe78c65"
+				"spark.autotune.trackingId": "3fe89455-ff0c-4542-b132-df7448f52533"
 			}
 		},
 		"metadata": {
@@ -153,9 +153,45 @@
 					}
 				},
 				"source": [
-					"merge_taxis_df.head(5)"
+					"df_trip.head(5)"
 				],
-				"execution_count": 27
+				"execution_count": 48
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_trip[(df_trip['vendor_id']=='VTS') & (df_trip['store_and_fwd_flag'] !='null')].head(10)"
+				],
+				"execution_count": 49
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_trip.select('store_and_fwd_flag').where (df_trip['vendor_id'] == 'VTS')"
+				],
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -202,6 +238,62 @@
 					".save(storage_path_delta)"
 				],
 				"execution_count": 33
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"taxi_delta_df = spark.read.format(\"delta\").load(storage_path_delta)\r\n",
+					"taxi_delta_df.show(n=1, vertical=True)"
+				],
+				"execution_count": 39
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"taxi_delta_df.groupBy('vendor_id').count().show()\r\n",
+					""
+				],
+				"execution_count": 41
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
