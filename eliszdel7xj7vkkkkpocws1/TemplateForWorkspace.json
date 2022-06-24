@@ -1416,7 +1416,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b9d26049-a353-434d-b798-536da09ad6a0"
+						"spark.autotune.trackingId": "b489207b-4cf6-499d-a31b-0e8fa8e940c3"
 					}
 				},
 				"metadata": {
@@ -1441,7 +1441,8 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112
+						"memory": 112,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1646,6 +1647,25 @@
 							}
 						},
 						"source": [
+							"merge_df.info()"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
 							"# How many passengers tip'd by various amounts\r\n",
 							"ax2 = merge_df.boxplot(column=['tip_amount'], by=['passenger_count'])\r\n",
 							"ax2.set_title('Tip amount by Passenger count')\r\n",
@@ -1701,7 +1721,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ed92883a-00dd-4165-bd34-58f8a2e08ccb"
+						"spark.autotune.trackingId": "adbe48d5-7679-4abf-b320-06bd1c0ccf15"
 					}
 				},
 				"metadata": {
@@ -2373,6 +2393,184 @@
 			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1-Data Lakehouse')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "ws1sparkpool1",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "112g",
+					"driverCores": 16,
+					"executorMemory": "112g",
+					"executorCores": 16,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "08e7d3f5-44a4-44f3-ab58-acb0171c0014"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/281e4630-88bb-4464-b35f-af54cdd4252d/resourceGroups/Synapse-1-click-RG/providers/Microsoft.Synapse/workspaces/eliszdel7xj7vkkkkpocws1/bigDataPools/ws1sparkpool1",
+						"name": "ws1sparkpool1",
+						"type": "Spark",
+						"endpoint": "https://eliszdel7xj7vkkkkpocws1.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ws1sparkpool1",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 5,
+						"cores": 16,
+						"memory": 112,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df_trip = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv', \r\n",
+							"format='csv',\r\n",
+							"inferSchema='True',\r\n",
+							"header=True\r\n",
+							")"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
+							"format='csv',\r\n",
+							"inferSchema='True',\r\n",
+							"header=True\r\n",
+							")"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import pandas as pd\r\n",
+							"\r\n",
+							"df_fares_pandas = df_fares.toPandas()\r\n",
+							"df_trip_pandas = df_trip.toPandas()\r\n",
+							"merge_taxis_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])\r\n",
+							"#merge_taxis_df.dropna(inplace=True, axis=0)\r\n",
+							"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"merge_taxis_df.info()"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							}
+						},
+						"source": [
+							"%%sql\r\n",
+							"-- Create Delta Lake table, define schema and location\r\n",
+							"CREATE TABLE DELTA_Employees (\r\n",
+							"  Employee STRING NOT NULL,\r\n",
+							"  Salary INT NOT NULL,\r\n",
+							"  BeginDate DATE NOT NULL,\r\n",
+							"  EndDate DATE NOT NULL,\r\n",
+							"  CurrentRecord INT NOT NULL \r\n",
+							")\r\n",
+							"USING DELTA\r\n",
+							"-- specify data lake folder location\r\n",
+							"LOCATION '/taxi/clean_data/' "
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
 			"dependsOn": []
 		}
 	]
