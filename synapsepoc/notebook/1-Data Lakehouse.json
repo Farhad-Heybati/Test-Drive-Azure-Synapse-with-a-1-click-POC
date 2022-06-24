@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "621c13fe-dd6c-4ec7-9114-cd2821067f58"
+				"spark.autotune.trackingId": "777edf51-408b-4725-8d61-04b453694c61"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": 5
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -89,7 +89,7 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -113,7 +113,39 @@
 					"#merge_taxis_df.dropna(inplace=True, axis=0)\r\n",
 					"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']"
 				],
-				"execution_count": 7
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					}
+				},
+				"source": [
+					"%%sql\r\n",
+					"-- Create Delta Lake table, define schema and location\r\n",
+					"CREATE TABLE DELTA_Employees (\r\n",
+					"  Employee STRING NOT NULL,\r\n",
+					"  Salary INT NOT NULL,\r\n",
+					"  BeginDate DATE NOT NULL,\r\n",
+					"  EndDate DATE NOT NULL,\r\n",
+					"  CurrentRecord INT NOT NULL \r\n",
+					")\r\n",
+					"USING DELTA\r\n",
+					"-- specify data lake folder location\r\n",
+					"LOCATION '/taxis/Employees/' "
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
