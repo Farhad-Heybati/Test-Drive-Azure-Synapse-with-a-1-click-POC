@@ -1416,7 +1416,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b489207b-4cf6-499d-a31b-0e8fa8e940c3"
+						"spark.autotune.trackingId": "830d87e3-5643-4819-a610-dc716f6a76d2"
 					}
 				},
 				"metadata": {
@@ -1441,8 +1441,7 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112,
-						"automaticScaleJobs": false
+						"memory": 112
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1701,6 +1700,176 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/1-Data Lakehouse')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "ws1sparkpool1",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "112g",
+					"driverCores": 16,
+					"executorMemory": "112g",
+					"executorCores": 16,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "c6c256ba-a625-4d97-8f9c-01f6d0f5880d"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/281e4630-88bb-4464-b35f-af54cdd4252d/resourceGroups/Synapse-1-click-RG/providers/Microsoft.Synapse/workspaces/eliszdel7xj7vkkkkpocws1/bigDataPools/ws1sparkpool1",
+						"name": "ws1sparkpool1",
+						"type": "Spark",
+						"endpoint": "https://eliszdel7xj7vkkkkpocws1.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ws1sparkpool1",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 5,
+						"cores": 16,
+						"memory": 112,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df_trip = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv', \r\n",
+							"format='csv',\r\n",
+							"inferSchema='True',\r\n",
+							"header=True\r\n",
+							")"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
+							"format='csv',\r\n",
+							"inferSchema='True',\r\n",
+							"header=True\r\n",
+							")"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import pandas as pd\r\n",
+							"\r\n",
+							"df_fares_pandas = df_fares.toPandas()\r\n",
+							"df_trip_pandas = df_trip.toPandas()\r\n",
+							"merge_taxis_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])\r\n",
+							"#merge_taxis_df.dropna(inplace=True, axis=0)\r\n",
+							"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']\r\n",
+							"\r\n",
+							"merge_taxis_df.head(1)"
+						],
+						"outputs": [],
+						"execution_count": 35
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"drop table "
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"delta_table_path = 'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/Delta_Demo'\r\n",
+							"\r\n",
+							"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
+							"dr\r\n",
+							"merge_taxis_spark_df.write.format(\"delta\").partitionBy(\"Col3\")save(delta_table_path)"
+						],
+						"outputs": [],
+						"execution_count": 34
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/1-Spark-Database-Delta')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -1746,8 +1915,7 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112,
-						"automaticScaleJobs": false
+						"memory": 112
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2334,202 +2502,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/ws1sparkpool1')]",
-			"type": "Microsoft.Synapse/workspaces/bigDataPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"autoPause": {
-					"enabled": true,
-					"delayInMinutes": 15
-				},
-				"autoScale": {
-					"enabled": true,
-					"maxNodeCount": 6,
-					"minNodeCount": 3
-				},
-				"nodeCount": 5,
-				"nodeSize": "Large",
-				"nodeSizeFamily": "MemoryOptimized",
-				"sparkVersion": "2.4",
-				"isComputeIsolationEnabled": false,
-				"sessionLevelPackagesEnabled": false,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "francecentral"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/eliszdel7xj7vkkkkpocws1p1')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "francecentral"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/default')]",
-			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/1-Data Lakehouse')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "ws1sparkpool1",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "112g",
-					"driverCores": 16,
-					"executorMemory": "112g",
-					"executorCores": 16,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5be52f53-fa7a-4d7f-84c4-61408401f56c"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/281e4630-88bb-4464-b35f-af54cdd4252d/resourceGroups/Synapse-1-click-RG/providers/Microsoft.Synapse/workspaces/eliszdel7xj7vkkkkpocws1/bigDataPools/ws1sparkpool1",
-						"name": "ws1sparkpool1",
-						"type": "Spark",
-						"endpoint": "https://eliszdel7xj7vkkkkpocws1.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ws1sparkpool1",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "2.4",
-						"nodeCount": 5,
-						"cores": 16,
-						"memory": 112,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {
-							"microsoft": {
-								"language": "python"
-							}
-						},
-						"source": [
-							"%%pyspark\r\n",
-							"df_trip = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data.csv', \r\n",
-							"format='csv',\r\n",
-							"inferSchema='True',\r\n",
-							"header=True\r\n",
-							")"
-						],
-						"outputs": [],
-						"execution_count": 5
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							},
-							"microsoft": {
-								"language": "python"
-							}
-						},
-						"source": [
-							"%%pyspark\r\n",
-							"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data.csv', \r\n",
-							"format='csv',\r\n",
-							"inferSchema='True',\r\n",
-							"header=True\r\n",
-							")"
-						],
-						"outputs": [],
-						"execution_count": 6
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"import pandas as pd\r\n",
-							"\r\n",
-							"df_fares_pandas = df_fares.toPandas()\r\n",
-							"df_trip_pandas = df_trip.toPandas()\r\n",
-							"merge_taxis_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])\r\n",
-							"#merge_taxis_df.dropna(inplace=True, axis=0)\r\n",
-							"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']\r\n",
-							"\r\n",
-							"merge_taxis_df.head(1)"
-						],
-						"outputs": [],
-						"execution_count": 35
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							},
-							"microsoft": {}
-						},
-						"source": [
-							"delta_table_path = 'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/Delta_Demo'\r\n",
-							"\r\n",
-							"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
-							"dr\r\n",
-							"merge_taxis_spark_df.write.format(\"delta\").partitionBy(\"Col3\")save(delta_table_path)"
-						],
-						"outputs": [],
-						"execution_count": 34
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -2550,7 +2522,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b70f1f45-05f9-4fc4-9f22-a50f3bec8e68"
+						"spark.autotune.trackingId": "0496e0ee-b40d-4839-aa5c-c8826f48d7b9"
 					}
 				},
 				"metadata": {
@@ -2575,8 +2547,7 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112,
-						"automaticScaleJobs": false
+						"memory": 112
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2619,6 +2590,50 @@
 					}
 				]
 			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ws1sparkpool1')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 6,
+					"minNodeCount": 3
+				},
+				"nodeCount": 5,
+				"nodeSize": "Large",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "2.4",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "francecentral"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/eliszdel7xj7vkkkkpocws1p1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "francecentral"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/default')]",
+			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {},
 			"dependsOn": []
 		}
 	]
