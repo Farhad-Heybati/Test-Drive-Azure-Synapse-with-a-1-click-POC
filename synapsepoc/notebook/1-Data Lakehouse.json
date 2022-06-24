@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3e48b9d7-a136-4a13-8572-d35821a6bebe"
+				"spark.autotune.trackingId": "72c2ba72-ade7-4541-ac20-045692e2f353"
 			}
 		},
 		"metadata": {
@@ -116,6 +116,24 @@
 					"merge_taxis_df.head(1)"
 				],
 				"execution_count": 35
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"drop table "
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
