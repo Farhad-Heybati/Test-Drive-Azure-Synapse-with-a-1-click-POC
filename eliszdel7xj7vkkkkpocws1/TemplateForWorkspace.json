@@ -1720,7 +1720,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c6c256ba-a625-4d97-8f9c-01f6d0f5880d"
+						"spark.autotune.trackingId": "30efda54-8d98-4fbe-9ca3-e9a4cf5b6c96"
 					}
 				},
 				"metadata": {
@@ -1767,7 +1767,7 @@
 							")"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -1794,7 +1794,7 @@
 							")"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -1821,7 +1821,7 @@
 							"merge_taxis_df.head(1)"
 						],
 						"outputs": [],
-						"execution_count": 35
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
@@ -1837,10 +1837,10 @@
 							}
 						},
 						"source": [
-							"drop table "
+							"DROP TABLE taxi.merge_taxis_delta"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 17
 					},
 					{
 						"cell_type": "code",
@@ -1859,11 +1859,29 @@
 							"delta_table_path = 'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/Delta_Demo'\r\n",
 							"\r\n",
 							"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
-							"dr\r\n",
-							"merge_taxis_spark_df.write.format(\"delta\").partitionBy(\"Col3\")save(delta_table_path)"
+							"merge_taxis_spark_df.write.format(\"delta\").mode(\"overwrite\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").saveAsTable('taxis.merge_taxis_delta')"
 						],
 						"outputs": [],
-						"execution_count": 34
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"merge_taxis_spark_df['rate_code'] = "
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
