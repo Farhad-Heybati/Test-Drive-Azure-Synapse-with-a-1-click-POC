@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "72c2ba72-ade7-4541-ac20-045692e2f353"
+				"spark.autotune.trackingId": "b20ad5f8-ae6f-4f11-b7b4-61e9a5de8c53"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": 5
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -89,7 +89,7 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": 6
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +115,7 @@
 					"\r\n",
 					"merge_taxis_df.head(1)"
 				],
-				"execution_count": 35
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -131,9 +131,9 @@
 					}
 				},
 				"source": [
-					"drop table "
+					"DROP TABLE taxi.merge_taxis_delta"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -152,10 +152,27 @@
 					"delta_table_path = 'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/Delta_Demo'\r\n",
 					"\r\n",
 					"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
-					"dr\r\n",
-					"merge_taxis_spark_df.write.format(\"delta\").partitionBy(\"Col3\")save(delta_table_path)"
+					"merge_taxis_spark_df.write.format(\"delta\").mode(\"overwrite\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").saveAsTable('taxis.merge_taxis_delta')"
 				],
-				"execution_count": 34
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"merge_taxis_spark_df['rate_code'] = "
+				],
+				"execution_count": null
 			}
 		]
 	}
