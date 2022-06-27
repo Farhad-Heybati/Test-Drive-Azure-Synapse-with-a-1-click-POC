@@ -1720,7 +1720,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "30efda54-8d98-4fbe-9ca3-e9a4cf5b6c96"
+						"spark.autotune.trackingId": "b8de1b8e-af46-4677-bb63-ab39838f0520"
 					}
 				},
 				"metadata": {
@@ -1767,7 +1767,7 @@
 							")"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 11
 					},
 					{
 						"cell_type": "code",
@@ -1794,7 +1794,7 @@
 							")"
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": 12
 					},
 					{
 						"cell_type": "code",
@@ -1821,26 +1821,7 @@
 							"merge_taxis_df.head(1)"
 						],
 						"outputs": [],
-						"execution_count": 14
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"DROP TABLE taxi.merge_taxis_delta"
-						],
-						"outputs": [],
-						"execution_count": 17
+						"execution_count": 13
 					},
 					{
 						"cell_type": "code",
@@ -1862,7 +1843,7 @@
 							"merge_taxis_spark_df.write.format(\"delta\").mode(\"overwrite\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").saveAsTable('taxis.merge_taxis_delta')"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
@@ -1878,7 +1859,117 @@
 							}
 						},
 						"source": [
-							"merge_taxis_spark_df['rate_code'] = "
+							"from pyspark.sql.functions import col\r\n",
+							"\r\n",
+							"merge_taxis_spark_df = merge_taxis_spark_df.withColumn(\"rate_code1\",col(\"rate_code\")*2)\r\n",
+							"\r\n",
+							"#df2 = df.withColumn('INTERRUPTION_DATE', ,df['INTERRUPTION_TIME'].cast(DateType()))\r\n",
+							"merge_taxis_spark_df = merge_taxis_spark_df.drop(\"rate_code\")\r\n",
+							"\r\n",
+							"print(merge_taxis_spark_df.head(1))\r\n",
+							"print()\r\n",
+							"print(merge_taxis_spark_df.columns)"
+						],
+						"outputs": [],
+						"execution_count": 27
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"merge_taxis_spark_df.write.format(\"delta\").mode(\"overwrite\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").saveAsTable('taxis.merge_taxis_delta')"
+						],
+						"outputs": [],
+						"execution_count": 28
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"spark.sql(\"SHOW TABLES\").show(truncate=False)\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"spark.sql(\"DESCRIBE EXTENDED taxis.merge_taxis_delta\").show(truncate=False)"
+						],
+						"outputs": [],
+						"execution_count": 10
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%sql\r\n",
+							"select * from taxis.merge_taxis_delta where trip_time_in_secs = 242"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
 						],
 						"outputs": [],
 						"execution_count": null
