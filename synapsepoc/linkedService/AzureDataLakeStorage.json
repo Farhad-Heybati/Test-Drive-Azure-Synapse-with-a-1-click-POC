@@ -7,7 +7,7 @@
 			"url": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		},
 		"connectVia": {
-			"referenceName": "AutoResolveIntegrationRuntime",
+			"referenceName": "IntegrationRuntime1",
 			"type": "IntegrationRuntimeReference"
 		}
 	}
