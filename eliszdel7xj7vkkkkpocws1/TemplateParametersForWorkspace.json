@@ -19,6 +19,9 @@
 		},
 		"keyVaultLinkedservice_properties_typeProperties_baseUrl": {
 			"value": "@{concat('https://',linkedService().keyVaultName,'.vault.azure.net/')}"
+		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"value": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		}
 	}
 }
