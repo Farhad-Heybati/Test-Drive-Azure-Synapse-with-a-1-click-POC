@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": "fares-data.parquet",
 				"folderPath": "Adf-Parquet-Files",
 				"fileSystem": "public"
 			},
