@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e8995db4-d303-44ea-b94e-c2baa61d81a6"
+				"spark.autotune.trackingId": "a1e821e7-bac8-4977-9dc5-d3b87d6a95e5"
 			}
 		},
 		"metadata": {
@@ -49,8 +49,30 @@
 		},
 		"cells": [
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## **Read CSV Files from Datalake**"
+				]
+			},
+			{
 				"cell_type": "code",
 				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
 					"microsoft": {
 						"language": "python"
 					}
@@ -63,7 +85,7 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": 11
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -89,7 +111,20 @@
 					"header=True\r\n",
 					")"
 				],
-				"execution_count": 12
+				"execution_count": 34
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Do an inner join between the 2 files based on the key values and all data preparation"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +150,48 @@
 					"\r\n",
 					"merge_taxis_df.head(1)"
 				],
-				"execution_count": 13
+				"execution_count": 35
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## 2 ways to creat a delta table:\r\n",
+					"1. Catalogue managed table based on Hive metastore (storage PATH is hidden and managed by system)\r\n",
+					"2. Based on PATH"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Catalogue based table"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Creat table and replace all data"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -131,12 +207,25 @@
 					}
 				},
 				"source": [
-					"delta_table_path = 'abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/Delta_Demo'\r\n",
-					"\r\n",
 					"merge_taxis_spark_df=spark.createDataFrame(merge_taxis_df) \r\n",
+					"\r\n",
+					"# overwrite => To atomically replace all the data in a table\r\n",
 					"merge_taxis_spark_df.write.format(\"delta\").mode(\"overwrite\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").saveAsTable('taxis.merge_taxis_delta')"
 				],
-				"execution_count": 14
+				"execution_count": 36
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Upadte the Datafram by replacing all data"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -163,7 +252,7 @@
 					"print()\r\n",
 					"print(merge_taxis_spark_df.columns)"
 				],
-				"execution_count": 27
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +270,7 @@
 				"source": [
 					"merge_taxis_spark_df.write.format(\"delta\").mode(\"overwrite\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").saveAsTable('taxis.merge_taxis_delta')"
 				],
-				"execution_count": 28
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -200,7 +289,7 @@
 					"spark.sql(\"SHOW TABLES\").show(truncate=False)\r\n",
 					""
 				],
-				"execution_count": 8
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -218,7 +307,7 @@
 				"source": [
 					"spark.sql(\"DESCRIBE EXTENDED taxis.merge_taxis_delta\").show(truncate=False)"
 				],
-				"execution_count": 10
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -241,7 +330,396 @@
 					"%%sql\r\n",
 					"select * from taxis.merge_taxis_delta where trip_time_in_secs = 242"
 				],
-				"execution_count": 11
+				"execution_count": 37
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# User define PATH"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import random\r\n",
+					"\r\n",
+					"#session_id = random.randint(0,1000000)\r\n",
+					"delta_table_path = \"/delta/merge_taxis_delta\"\r\n",
+					"\r\n",
+					"delta_table_path"
+				],
+				"execution_count": 59
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"merge_taxis_spark_df.write.format(\"delta\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").mode(\"overwrite\").save(delta_table_path)"
+				],
+				"execution_count": 41
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Read back to Datafram"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df = spark.read.format(\"delta\").load(delta_table_path)\r\n",
+					"df.head(1)"
+				],
+				"execution_count": 42
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Append Data to an existing delta table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"\r\n",
+					"df_trip = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/trip-data-29062022.csv', \r\n",
+					"format='csv',\r\n",
+					"inferSchema='True',\r\n",
+					"header=True\r\n",
+					")\r\n",
+					"\r\n",
+					"df_fares = spark.read.load('abfss://public@eliszdel7xj7vkkkkpoc.dfs.core.windows.net/fares-data-29062022.csv', \r\n",
+					"format='csv',\r\n",
+					"inferSchema='True',\r\n",
+					"header=True\r\n",
+					")\r\n",
+					"\r\n",
+					"import pandas as pd\r\n",
+					"\r\n",
+					"df_fares_pandas = df_fares.toPandas()\r\n",
+					"df_trip_pandas = df_trip.toPandas()\r\n",
+					"merge_taxis_df = pd.merge(df_trip_pandas, df_fares_pandas, how=\"inner\", on=[\"vendor_id\", \"medallion\", \"hack_license\", \"pickup_datetime\"])\r\n",
+					"#merge_taxis_df.dropna(inplace=True, axis=0)\r\n",
+					"merge_taxis_df = merge_taxis_df[merge_taxis_df['store_and_fwd_flag'] != 'null']\r\n",
+					"\r\n",
+					"merge_taxis_df.head(1)\r\n",
+					"\r\n",
+					"merge_taxis_spark_df = spark.createDataFrame(merge_taxis_df) \r\n",
+					""
+				],
+				"execution_count": 43
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"merge_taxis_spark_df.write.format(\"delta\").mode(\"append\").save(delta_table_path)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"merge_taxis_spark_df.write.format(\"delta\").partitionBy(\"vendor_id\",\"hack_license\",\"medallion\").mode(\"append\").saveAsTable(\"taxis.merge_taxis_delta\")"
+				],
+				"execution_count": 45
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Update a table for particluar row"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"delta_table = DeltaTable.forPath(spark, delta_table_path)\r\n",
+					"\r\n",
+					"df = spark.read.format(\"delta\").load(delta_table_path)  \r\n",
+					"df.head(2)"
+				],
+				"execution_count": 46
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"delta_table.update(\r\n",
+					"  condition = expr(\"store_and_fwd_flag == N\" and \"trip_time_in_secs == 457\"),\r\n",
+					"  set = { \"rate_code\": expr(\"rate_code + 30\") })\r\n",
+					"delta_table.toDF().show()"
+				],
+				"execution_count": 47
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### History and Time Travel"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"delta_table = DeltaTable.forPath(spark, delta_table_path)\r\n",
+					"\r\n",
+					"delta_table.history().show(n=10)"
+				],
+				"execution_count": 61
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"yesterday = spark.sql(\"SELECT CAST(date_sub(current_date(), 1) AS STRING)\").collect()[0][0]\r\n",
+					"df = spark.read.format(\"delta\").option(\"timestampAsOf\", yesterday).load(delta_table_path)"
+				],
+				"execution_count": 62
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Merge by adding columns"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql.functions import col\r\n",
+					"\r\n",
+					"merge_taxis_spark_df = merge_taxis_spark_df.withColumn(\"rate_code2\",col(\"rate_code1\")*2.2)\r\n",
+					"\r\n",
+					"#df2 = df.withColumn('INTERRUPTION_DATE', ,df['INTERRUPTION_TIME'].cast(DateType()))\r\n",
+					"merge_taxis_spark_df = merge_taxis_spark_df.drop(\"rate_code\")\r\n",
+					"\r\n",
+					"print(merge_taxis_spark_df.head(1))\r\n",
+					"print()\r\n",
+					"print(merge_taxis_spark_df.columns)"
+				],
+				"execution_count": 29
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"merge_taxis_spark_df.write.format(\"delta\").mode(\"overwrite\").option(\"mergeSchema\", \"true\").save(delta_table_path)\r\n",
+					"merge_taxis_spark_df.show()"
+				],
+				"execution_count": 37
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"delta_table.history().show(20, 1000, False)"
+				],
+				"execution_count": 43
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"spark.sql(\"DESCRIBE HISTORY delta.`{0}`\".format(delta_table_path)).show()"
+				],
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",

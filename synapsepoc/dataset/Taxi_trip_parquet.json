@@ -1,0 +1,20 @@
+{
+	"name": "Taxi_trip_parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "Adf-Parquet-Files",
+				"fileSystem": "public"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
