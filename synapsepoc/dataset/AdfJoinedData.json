@@ -1,0 +1,65 @@
+{
+	"name": "AdfJoinedData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "Adf-Parquet-Files",
+				"fileSystem": "public"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "medallion",
+				"type": "UTF8"
+			},
+			{
+				"name": "hack_license",
+				"type": "UTF8"
+			},
+			{
+				"name": "vendor_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "pickup_datetime",
+				"type": "UTF8"
+			},
+			{
+				"name": "payment_type",
+				"type": "UTF8"
+			},
+			{
+				"name": "fare_amount",
+				"type": "UTF8"
+			},
+			{
+				"name": "surcharge",
+				"type": "UTF8"
+			},
+			{
+				"name": "mta_tax",
+				"type": "UTF8"
+			},
+			{
+				"name": "tip_amount",
+				"type": "UTF8"
+			},
+			{
+				"name": "tolls_amount",
+				"type": "UTF8"
+			},
+			{
+				"name": "total_amount",
+				"type": "UTF8"
+			}
+		]
+	}
+}

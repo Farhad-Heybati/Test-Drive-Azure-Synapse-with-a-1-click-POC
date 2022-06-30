@@ -19,10 +19,21 @@
 					"name": "trip"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AdfJoinedData",
+						"type": "DatasetReference"
+					},
+					"name": "Adls"
+				}
+			],
 			"transformations": [
 				{
 					"name": "joinTripFares"
+				},
+				{
+					"name": "CleanData"
 				}
 			],
 			"scriptLines": [
@@ -72,7 +83,29 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> joinTripFares"
+				"     broadcast: 'auto')~> joinTripFares",
+				"joinTripFares filter(toInteger(trip@trip_distance) > 0 && toInteger(trip@passenger_count) > 0 && Fares@store_and_fwd_flag != 'NULL') ~> CleanData",
+				"CleanData sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          medallion as string,",
+				"          hack_license as string,",
+				"          vendor_id as string,",
+				"          pickup_datetime as string,",
+				"          payment_type as string,",
+				"          fare_amount as string,",
+				"          surcharge as string,",
+				"          mta_tax as string,",
+				"          tip_amount as string,",
+				"          tolls_amount as string,",
+				"          total_amount as string",
+				"     ),",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> Adls"
 			]
 		}
 	}
