@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageIR'"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
 		"HttpServerTripDataLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://raw.githubusercontent.com/Azure/Test-Drive-Azure-Synapse-with-a-1-click-POC/main/tripDataAndFaresCSV/trip-data.csv"
@@ -36,6 +40,10 @@
 			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		},
 		"AzureDataLakeStorageIR_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		}
@@ -1737,7 +1745,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e5bb4375-4b02-4bb5-bb31-c83816c3590b"
+						"spark.autotune.trackingId": "c61adf05-00f1-44ce-aab8-639561f76d0e"
 					}
 				},
 				"metadata": {
@@ -3353,12 +3361,12 @@
 					"url": "[parameters('AzureDataLakeStorage_properties_typeProperties_url')]"
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "IntegrationRuntime1",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
 			]
 		},
 		{
@@ -3460,12 +3468,70 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "trip-data.parquet",
 						"folderPath": "Adf-Parquet-Files",
 						"fileSystem": "public"
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "rate_code",
+						"type": "UTF8"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "passenger_count",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_distance",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "UTF8"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage')]"
@@ -3564,7 +3630,7 @@
 						},
 						"copyComputeScaleProperties": {
 							"dataIntegrationUnit": 4,
-							"timeToLive": 5
+							"timeToLive": 10
 						},
 						"pipelineExternalComputeScaleProperties": {
 							"timeToLive": 60
@@ -3690,6 +3756,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "fares-data.parquet",
 						"folderPath": "Adf-Parquet-Files",
 						"fileSystem": "public"
 					},
@@ -3756,6 +3823,267 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorageIR')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/JoinTripFares')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "joinTripFares",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Join trop to Fares",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Fares": {},
+									"trip": {},
+									"Adls": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/dataflows/Join trop to Fares')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Join trop to Fares')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "fairs_Parquet",
+								"type": "DatasetReference"
+							},
+							"name": "Fares"
+						},
+						{
+							"dataset": {
+								"referenceName": "Taxi_trip_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "trip"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AdfJoinedData",
+								"type": "DatasetReference"
+							},
+							"name": "Adls"
+						}
+					],
+					"transformations": [
+						{
+							"name": "joinTripFares"
+						},
+						{
+							"name": "CleanData"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          medallion as string,",
+						"          hack_license as string,",
+						"          vendor_id as string,",
+						"          rate_code as string,",
+						"          store_and_fwd_flag as string,",
+						"          pickup_datetime as string,",
+						"          dropoff_datetime as string,",
+						"          passenger_count as string,",
+						"          trip_time_in_secs as string,",
+						"          trip_distance as string,",
+						"          pickup_longitude as string,",
+						"          pickup_latitude as string,",
+						"          dropoff_longitude as string,",
+						"          dropoff_latitude as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> Fares",
+						"source(output(",
+						"          medallion as string,",
+						"          hack_license as string,",
+						"          vendor_id as string,",
+						"          rate_code as string,",
+						"          store_and_fwd_flag as string,",
+						"          pickup_datetime as string,",
+						"          dropoff_datetime as string,",
+						"          passenger_count as string,",
+						"          trip_time_in_secs as string,",
+						"          trip_distance as string,",
+						"          pickup_longitude as string,",
+						"          pickup_latitude as string,",
+						"          dropoff_longitude as string,",
+						"          dropoff_latitude as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> trip",
+						"Fares, trip join(Fares@vendor_id == trip@vendor_id",
+						"     && Fares@medallion == trip@medallion",
+						"     && Fares@hack_license == trip@hack_license,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinTripFares",
+						"joinTripFares filter(toInteger(trip@trip_distance) > 0 && toInteger(trip@passenger_count) > 0 && Fares@store_and_fwd_flag != 'NULL') ~> CleanData",
+						"CleanData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          medallion as string,",
+						"          hack_license as string,",
+						"          vendor_id as string,",
+						"          pickup_datetime as string,",
+						"          payment_type as string,",
+						"          fare_amount as string,",
+						"          surcharge as string,",
+						"          mta_tax as string,",
+						"          tip_amount as string,",
+						"          tolls_amount as string,",
+						"          total_amount as string",
+						"     ),",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> Adls"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/fairs_Parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/Taxi_trip_parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/AdfJoinedData')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "IntegrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AdfJoinedData')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Adf-Parquet-Files",
+						"fileSystem": "public"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "payment_type",
+						"type": "UTF8"
+					},
+					{
+						"name": "fare_amount",
+						"type": "UTF8"
+					},
+					{
+						"name": "surcharge",
+						"type": "UTF8"
+					},
+					{
+						"name": "mta_tax",
+						"type": "UTF8"
+					},
+					{
+						"name": "tip_amount",
+						"type": "UTF8"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "UTF8"
+					},
+					{
+						"name": "total_amount",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		}
 	]
