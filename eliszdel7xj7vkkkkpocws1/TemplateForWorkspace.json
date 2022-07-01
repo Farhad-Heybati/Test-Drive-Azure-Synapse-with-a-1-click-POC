@@ -4089,12 +4089,32 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\n\nEXEC sp_addrolemember 'db_owner', [demo-hr-v2]\n\nSELECT name, type, type_desc, CAST(CAST(sid as varbinary(16)) as uniqueidentifier) as appId \nfrom sys.database_principals WHERE name = 'demo-hr-v2'\n\n\n",
+					"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\n\nEXEC sp_addrolemember 'db_datareader', [demo-hr-v2]\n\nSELECT name, type, type_desc, CAST(CAST(sid as varbinary(16)) as uniqueidentifier) as appId \nfrom sys.database_principals WHERE name = 'demo-hr-v2'\n\n\n",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
 						"databaseName": "DataExplorationDBV2",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\nGO\nEXEC sp_addrolemember 'db_datareader', [demo-hr-v2]\nGO\nALTER ROLE db_datareader ADD MEMBER [demo-hr-v2];",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "DataExplorationDB",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
