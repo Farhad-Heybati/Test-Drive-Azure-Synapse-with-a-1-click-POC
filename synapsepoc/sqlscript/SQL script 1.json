@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\nGO\nEXEC sp_addrolemember 'db_datareader', [demo-hr-v2]\nGO\nALTER ROLE db_datareader ADD MEMBER [demo-hr-v2];",
+			"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\nGO\n-- For deidcated pool\nEXEC sp_addrolemember 'db_datareader', [demo-hr-v2]\nGO\n-- For Serverless\nALTER ROLE db_datareader ADD MEMBER [demo-hr-v2];\n\nGRANT REFERENCES ON DATABASE SCOPED CREDENTIAL::[scoped_credential] TO [PurviewAccountName];",
 			"metadata": {
 				"language": "sql"
 			},
