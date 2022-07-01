@@ -2,7 +2,7 @@
 	"name": "Setup Purview Secu",
 	"properties": {
 		"content": {
-			"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\n\nEXEC sp_addrolemember 'db_owner', [demo-hr-v2]\n\nSELECT name, type, type_desc, CAST(CAST(sid as varbinary(16)) as uniqueidentifier) as appId \nfrom sys.database_principals WHERE name = 'demo-hr-v2'\n\n\n",
+			"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\n\nEXEC sp_addrolemember 'db_datareader', [demo-hr-v2]\n\nSELECT name, type, type_desc, CAST(CAST(sid as varbinary(16)) as uniqueidentifier) as appId \nfrom sys.database_principals WHERE name = 'demo-hr-v2'\n\n\n",
 			"metadata": {
 				"language": "sql"
 			},
