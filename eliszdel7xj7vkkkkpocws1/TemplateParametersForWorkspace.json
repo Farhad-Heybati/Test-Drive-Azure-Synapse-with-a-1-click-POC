@@ -5,14 +5,23 @@
 		"workspaceName": {
 			"value": "eliszdel7xj7vkkkkpocws1"
 		},
-		"TripFaresSynapseAnalyticsLinkedService_connectionString": {
+		"AzureDataLakeStorage1_accountKey": {
 			"value": ""
 		},
 		"AzureDataLakeStorageIR_accountKey": {
 			"value": ""
 		},
-		"AzureDataLakeStorage1_accountKey": {
+		"TripFaresSynapseAnalyticsLinkedService_connectionString": {
 			"value": ""
+		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"value": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
+		},
+		"AzureDataLakeStorageIR_properties_typeProperties_url": {
+			"value": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		},
 		"HttpServerTripDataLinkedService_properties_typeProperties_url": {
 			"value": "https://raw.githubusercontent.com/Azure/Test-Drive-Azure-Synapse-with-a-1-click-POC/main/tripDataAndFaresCSV/trip-data.csv"
@@ -25,15 +34,6 @@
 		},
 		"keyVaultLinkedservice_properties_typeProperties_baseUrl": {
 			"value": "@{concat('https://',linkedService().keyVaultName,'.vault.azure.net/')}"
-		},
-		"AzureDataLakeStorage_properties_typeProperties_url": {
-			"value": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorageIR_properties_typeProperties_url": {
-			"value": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"value": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		}
 	}
 }

@@ -7,17 +7,29 @@
 			"metadata": "Workspace name",
 			"defaultValue": "eliszdel7xj7vkkkkpocws1"
 		},
-		"TripFaresSynapseAnalyticsLinkedService_connectionString": {
+		"AzureDataLakeStorage1_accountKey": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'TripFaresSynapseAnalyticsLinkedService'"
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
 		},
 		"AzureDataLakeStorageIR_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageIR'"
 		},
-		"AzureDataLakeStorage1_accountKey": {
+		"TripFaresSynapseAnalyticsLinkedService_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+			"metadata": "Secure string for 'connectionString' of 'TripFaresSynapseAnalyticsLinkedService'"
+		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
+		},
+		"AzureDataLakeStorageIR_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		},
 		"HttpServerTripDataLinkedService_properties_typeProperties_url": {
 			"type": "string",
@@ -34,24 +46,212 @@
 		"keyVaultLinkedservice_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "@{concat('https://',linkedService().keyVaultName,'.vault.azure.net/')}"
-		},
-		"AzureDataLakeStorage_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorageIR_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://eliszdel7xj7vkkkkpoc.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
 		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/Copy-taxis-tripe-to-parquet')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy-taxis-tripe-to-parquet",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "taxi_trip_csv",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Taxi_trip_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/taxi_trip_csv')]",
+				"[concat(variables('workspaceId'), '/datasets/Taxi_trip_parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Copy_taxis_fare_to_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_taxis_fare_to_parquet",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "taxis_fare_csv",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "fairs_Parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/taxis_fare_csv')]",
+				"[concat(variables('workspaceId'), '/datasets/fairs_Parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/JoinTripFares')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "joinTripFares",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Join trop to Fares",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Fares": {},
+									"trip": {},
+									"Adls": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/Join trop to Fares')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/TripFaresDataPipeline')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
@@ -561,11 +761,80 @@
 				"[concat(variables('workspaceId'), '/datasets/faresDataSource')]",
 				"[concat(variables('workspaceId'), '/datasets/faresDataSink')]",
 				"[concat(variables('workspaceId'), '/dataflows/tripFaresDataTransformations')]",
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
 				"[concat(variables('workspaceId'), '/datasets/azureSynapseAnalyticsSchema')]",
 				"[concat(variables('workspaceId'), '/datasets/AzureSynapseAnalyticsTripsData')]",
 				"[concat(variables('workspaceId'), '/datasets/AzureSynapseAnalyticsFaresData')]",
 				"[concat(variables('workspaceId'), '/linkedServices/TripFaresDataLakeStorageLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AdfJoinedData')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Adf-Parquet-Files",
+						"fileSystem": "public"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "payment_type",
+						"type": "UTF8"
+					},
+					{
+						"name": "fare_amount",
+						"type": "UTF8"
+					},
+					{
+						"name": "surcharge",
+						"type": "UTF8"
+					},
+					{
+						"name": "mta_tax",
+						"type": "UTF8"
+					},
+					{
+						"name": "tip_amount",
+						"type": "UTF8"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "UTF8"
+					},
+					{
+						"name": "total_amount",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		},
 		{
@@ -691,6 +960,89 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Taxi_trip_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "trip-data.parquet",
+						"folderPath": "Adf-Parquet-Files",
+						"fileSystem": "public"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "rate_code",
+						"type": "UTF8"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "passenger_count",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_distance",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/azureSynapseAnalyticsSchema')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -803,6 +1155,89 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/TripFaresSynapseAnalyticsLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/fairs_Parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorageIR",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "fares-data.parquet",
+						"folderPath": "Adf-Parquet-Files",
+						"fileSystem": "public"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "rate_code",
+						"type": "UTF8"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "passenger_count",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_distance",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorageIR')]"
 			]
 		},
 		{
@@ -928,6 +1363,164 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/HttpServerTripFareDataLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/taxi_trip_csv')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "trip-data.csv",
+						"fileSystem": "public"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "String"
+					},
+					{
+						"name": "hack_license",
+						"type": "String"
+					},
+					{
+						"name": "vendor_id",
+						"type": "String"
+					},
+					{
+						"name": "rate_code",
+						"type": "String"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "String"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "String"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "String"
+					},
+					{
+						"name": "passenger_count",
+						"type": "String"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "String"
+					},
+					{
+						"name": "trip_distance",
+						"type": "String"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "String"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "String"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "String"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/taxis_fare_csv')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorageIR",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "fares-data.csv",
+						"fileSystem": "public"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "String"
+					},
+					{
+						"name": "hack_license",
+						"type": "String"
+					},
+					{
+						"name": "vendor_id",
+						"type": "String"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "String"
+					},
+					{
+						"name": "payment_type",
+						"type": "String"
+					},
+					{
+						"name": "fare_amount",
+						"type": "String"
+					},
+					{
+						"name": "surcharge",
+						"type": "String"
+					},
+					{
+						"name": "mta_tax",
+						"type": "String"
+					},
+					{
+						"name": "tip_amount",
+						"type": "String"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "String"
+					},
+					{
+						"name": "total_amount",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorageIR')]"
 			]
 		},
 		{
@@ -1063,6 +1656,71 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/HttpServerTripDataLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "IntegrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "IntegrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorageIR')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorageIR_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorageIR_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "IntegrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
 			]
 		},
 		{
@@ -1256,6 +1914,158 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/IntegrationRuntime1')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false
+						},
+						"copyComputeScaleProperties": {
+							"dataIntegrationUnit": 4,
+							"timeToLive": 10
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Join trop to Fares')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "fairs_Parquet",
+								"type": "DatasetReference"
+							},
+							"name": "Fares"
+						},
+						{
+							"dataset": {
+								"referenceName": "Taxi_trip_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "trip"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AdfJoinedData",
+								"type": "DatasetReference"
+							},
+							"name": "Adls"
+						}
+					],
+					"transformations": [
+						{
+							"name": "joinTripFares"
+						},
+						{
+							"name": "CleanData"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          medallion as string,",
+						"          hack_license as string,",
+						"          vendor_id as string,",
+						"          rate_code as string,",
+						"          store_and_fwd_flag as string,",
+						"          pickup_datetime as string,",
+						"          dropoff_datetime as string,",
+						"          passenger_count as string,",
+						"          trip_time_in_secs as string,",
+						"          trip_distance as string,",
+						"          pickup_longitude as string,",
+						"          pickup_latitude as string,",
+						"          dropoff_longitude as string,",
+						"          dropoff_latitude as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> Fares",
+						"source(output(",
+						"          medallion as string,",
+						"          hack_license as string,",
+						"          vendor_id as string,",
+						"          rate_code as string,",
+						"          store_and_fwd_flag as string,",
+						"          pickup_datetime as string,",
+						"          dropoff_datetime as string,",
+						"          passenger_count as string,",
+						"          trip_time_in_secs as string,",
+						"          trip_distance as string,",
+						"          pickup_longitude as string,",
+						"          pickup_latitude as string,",
+						"          dropoff_longitude as string,",
+						"          dropoff_latitude as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> trip",
+						"Fares, trip join(Fares@vendor_id == trip@vendor_id",
+						"     && Fares@medallion == trip@medallion",
+						"     && Fares@hack_license == trip@hack_license,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinTripFares",
+						"joinTripFares filter(toInteger(trip@trip_distance) > 0 && toInteger(trip@passenger_count) > 0 && Fares@store_and_fwd_flag != 'NULL') ~> CleanData",
+						"CleanData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          medallion as string,",
+						"          hack_license as string,",
+						"          vendor_id as string,",
+						"          pickup_datetime as string,",
+						"          payment_type as string,",
+						"          fare_amount as string,",
+						"          surcharge as string,",
+						"          mta_tax as string,",
+						"          tip_amount as string,",
+						"          tolls_amount as string,",
+						"          total_amount as string",
+						"     ),",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> Adls"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/fairs_Parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/Taxi_trip_parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/AdfJoinedData')]"
 			]
 		},
 		{
@@ -1745,7 +2555,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c61adf05-00f1-44ce-aab8-639561f76d0e"
+						"spark.autotune.trackingId": "a1e821e7-bac8-4977-9dc5-d3b87d6a95e5"
 					}
 				},
 				"metadata": {
@@ -1770,8 +2580,7 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 5,
 						"cores": 16,
-						"memory": 112,
-						"automaticScaleJobs": false
+						"memory": 112
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -3263,82 +4072,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Copy-taxis-tripe-to-parquet')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy-taxis-tripe-to-parquet",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "ParquetSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "ParquetWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "taxi_trip_csv",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Taxi_trip_parquet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/taxi_trip_csv')]",
-				"[concat(variables('workspaceId'), '/datasets/Taxi_trip_parquet')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/default/AzureDataLakeStorage127')]",
 			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks/managedPrivateEndpoints",
 			"apiVersion": "2019-06-01-preview",
@@ -3351,740 +4084,24 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorage')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"name": "[concat(parameters('workspaceName'), '/Setup Purview Secu')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage_properties_typeProperties_url')]"
+				"content": {
+					"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\n\nEXEC sp_addrolemember 'db_owner', [demo-hr-v2]\n\nSELECT name, type, type_desc, CAST(CAST(sid as varbinary(16)) as uniqueidentifier) as appId \nfrom sys.database_principals WHERE name = 'demo-hr-v2'\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "DataExplorationDBV2",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
 				},
-				"connectVia": {
-					"referenceName": "IntegrationRuntime1",
-					"type": "IntegrationRuntimeReference"
-				}
+				"type": "SqlQuery"
 			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/taxi_trip_csv')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "trip-data.csv",
-						"fileSystem": "public"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "medallion",
-						"type": "String"
-					},
-					{
-						"name": "hack_license",
-						"type": "String"
-					},
-					{
-						"name": "vendor_id",
-						"type": "String"
-					},
-					{
-						"name": "rate_code",
-						"type": "String"
-					},
-					{
-						"name": "store_and_fwd_flag",
-						"type": "String"
-					},
-					{
-						"name": "pickup_datetime",
-						"type": "String"
-					},
-					{
-						"name": "dropoff_datetime",
-						"type": "String"
-					},
-					{
-						"name": "passenger_count",
-						"type": "String"
-					},
-					{
-						"name": "trip_time_in_secs",
-						"type": "String"
-					},
-					{
-						"name": "trip_distance",
-						"type": "String"
-					},
-					{
-						"name": "pickup_longitude",
-						"type": "String"
-					},
-					{
-						"name": "pickup_latitude",
-						"type": "String"
-					},
-					{
-						"name": "dropoff_longitude",
-						"type": "String"
-					},
-					{
-						"name": "dropoff_latitude",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Taxi_trip_parquet')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "trip-data.parquet",
-						"folderPath": "Adf-Parquet-Files",
-						"fileSystem": "public"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "medallion",
-						"type": "UTF8"
-					},
-					{
-						"name": "hack_license",
-						"type": "UTF8"
-					},
-					{
-						"name": "vendor_id",
-						"type": "UTF8"
-					},
-					{
-						"name": "rate_code",
-						"type": "UTF8"
-					},
-					{
-						"name": "store_and_fwd_flag",
-						"type": "UTF8"
-					},
-					{
-						"name": "pickup_datetime",
-						"type": "UTF8"
-					},
-					{
-						"name": "dropoff_datetime",
-						"type": "UTF8"
-					},
-					{
-						"name": "passenger_count",
-						"type": "UTF8"
-					},
-					{
-						"name": "trip_time_in_secs",
-						"type": "UTF8"
-					},
-					{
-						"name": "trip_distance",
-						"type": "UTF8"
-					},
-					{
-						"name": "pickup_longitude",
-						"type": "UTF8"
-					},
-					{
-						"name": "pickup_latitude",
-						"type": "UTF8"
-					},
-					{
-						"name": "dropoff_longitude",
-						"type": "UTF8"
-					},
-					{
-						"name": "dropoff_latitude",
-						"type": "UTF8"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Copy_taxis_fare_to_parquet')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy_taxis_fare_to_parquet",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "ParquetSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "ParquetWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "taxis_fare_csv",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "fairs_Parquet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/taxis_fare_csv')]",
-				"[concat(variables('workspaceId'), '/datasets/fairs_Parquet')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/IntegrationRuntime1')]",
-			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "AutoResolve",
-						"dataFlowProperties": {
-							"computeType": "General",
-							"coreCount": 8,
-							"timeToLive": 10,
-							"cleanup": false
-						},
-						"copyComputeScaleProperties": {
-							"dataIntegrationUnit": 4,
-							"timeToLive": 10
-						},
-						"pipelineExternalComputeScaleProperties": {
-							"timeToLive": 60
-						}
-					}
-				},
-				"managedVirtualNetwork": {
-					"type": "ManagedVirtualNetworkReference",
-					"referenceName": "default"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorageIR')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorageIR_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('AzureDataLakeStorageIR_accountKey')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "IntegrationRuntime1",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/taxis_fare_csv')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorageIR",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "fares-data.csv",
-						"fileSystem": "public"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "medallion",
-						"type": "String"
-					},
-					{
-						"name": "hack_license",
-						"type": "String"
-					},
-					{
-						"name": "vendor_id",
-						"type": "String"
-					},
-					{
-						"name": "pickup_datetime",
-						"type": "String"
-					},
-					{
-						"name": "payment_type",
-						"type": "String"
-					},
-					{
-						"name": "fare_amount",
-						"type": "String"
-					},
-					{
-						"name": "surcharge",
-						"type": "String"
-					},
-					{
-						"name": "mta_tax",
-						"type": "String"
-					},
-					{
-						"name": "tip_amount",
-						"type": "String"
-					},
-					{
-						"name": "tolls_amount",
-						"type": "String"
-					},
-					{
-						"name": "total_amount",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorageIR')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/fairs_Parquet')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorageIR",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "fares-data.parquet",
-						"folderPath": "Adf-Parquet-Files",
-						"fileSystem": "public"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "medallion",
-						"type": "UTF8"
-					},
-					{
-						"name": "hack_license",
-						"type": "UTF8"
-					},
-					{
-						"name": "vendor_id",
-						"type": "UTF8"
-					},
-					{
-						"name": "rate_code",
-						"type": "UTF8"
-					},
-					{
-						"name": "store_and_fwd_flag",
-						"type": "UTF8"
-					},
-					{
-						"name": "pickup_datetime",
-						"type": "UTF8"
-					},
-					{
-						"name": "dropoff_datetime",
-						"type": "UTF8"
-					},
-					{
-						"name": "passenger_count",
-						"type": "UTF8"
-					},
-					{
-						"name": "trip_time_in_secs",
-						"type": "UTF8"
-					},
-					{
-						"name": "trip_distance",
-						"type": "UTF8"
-					},
-					{
-						"name": "pickup_longitude",
-						"type": "UTF8"
-					},
-					{
-						"name": "pickup_latitude",
-						"type": "UTF8"
-					},
-					{
-						"name": "dropoff_longitude",
-						"type": "UTF8"
-					},
-					{
-						"name": "dropoff_latitude",
-						"type": "UTF8"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorageIR')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/JoinTripFares')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "joinTripFares",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "1.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "Join trop to Fares",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"Fares": {},
-									"trip": {},
-									"Adls": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('workspaceId'), '/dataflows/Join trop to Fares')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Join trop to Fares')]",
-			"type": "Microsoft.Synapse/workspaces/dataflows",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "fairs_Parquet",
-								"type": "DatasetReference"
-							},
-							"name": "Fares"
-						},
-						{
-							"dataset": {
-								"referenceName": "Taxi_trip_parquet",
-								"type": "DatasetReference"
-							},
-							"name": "trip"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "AdfJoinedData",
-								"type": "DatasetReference"
-							},
-							"name": "Adls"
-						}
-					],
-					"transformations": [
-						{
-							"name": "joinTripFares"
-						},
-						{
-							"name": "CleanData"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          medallion as string,",
-						"          hack_license as string,",
-						"          vendor_id as string,",
-						"          rate_code as string,",
-						"          store_and_fwd_flag as string,",
-						"          pickup_datetime as string,",
-						"          dropoff_datetime as string,",
-						"          passenger_count as string,",
-						"          trip_time_in_secs as string,",
-						"          trip_distance as string,",
-						"          pickup_longitude as string,",
-						"          pickup_latitude as string,",
-						"          dropoff_longitude as string,",
-						"          dropoff_latitude as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false,",
-						"     format: 'parquet') ~> Fares",
-						"source(output(",
-						"          medallion as string,",
-						"          hack_license as string,",
-						"          vendor_id as string,",
-						"          rate_code as string,",
-						"          store_and_fwd_flag as string,",
-						"          pickup_datetime as string,",
-						"          dropoff_datetime as string,",
-						"          passenger_count as string,",
-						"          trip_time_in_secs as string,",
-						"          trip_distance as string,",
-						"          pickup_longitude as string,",
-						"          pickup_latitude as string,",
-						"          dropoff_longitude as string,",
-						"          dropoff_latitude as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false,",
-						"     format: 'parquet') ~> trip",
-						"Fares, trip join(Fares@vendor_id == trip@vendor_id",
-						"     && Fares@medallion == trip@medallion",
-						"     && Fares@hack_license == trip@hack_license,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> joinTripFares",
-						"joinTripFares filter(toInteger(trip@trip_distance) > 0 && toInteger(trip@passenger_count) > 0 && Fares@store_and_fwd_flag != 'NULL') ~> CleanData",
-						"CleanData sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          medallion as string,",
-						"          hack_license as string,",
-						"          vendor_id as string,",
-						"          pickup_datetime as string,",
-						"          payment_type as string,",
-						"          fare_amount as string,",
-						"          surcharge as string,",
-						"          mta_tax as string,",
-						"          tip_amount as string,",
-						"          tolls_amount as string,",
-						"          total_amount as string",
-						"     ),",
-						"     format: 'parquet',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> Adls"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/fairs_Parquet')]",
-				"[concat(variables('workspaceId'), '/datasets/Taxi_trip_parquet')]",
-				"[concat(variables('workspaceId'), '/datasets/AdfJoinedData')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorage1')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "IntegrationRuntime1",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/AdfJoinedData')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "Adf-Parquet-Files",
-						"fileSystem": "public"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "medallion",
-						"type": "UTF8"
-					},
-					{
-						"name": "hack_license",
-						"type": "UTF8"
-					},
-					{
-						"name": "vendor_id",
-						"type": "UTF8"
-					},
-					{
-						"name": "pickup_datetime",
-						"type": "UTF8"
-					},
-					{
-						"name": "payment_type",
-						"type": "UTF8"
-					},
-					{
-						"name": "fare_amount",
-						"type": "UTF8"
-					},
-					{
-						"name": "surcharge",
-						"type": "UTF8"
-					},
-					{
-						"name": "mta_tax",
-						"type": "UTF8"
-					},
-					{
-						"name": "tip_amount",
-						"type": "UTF8"
-					},
-					{
-						"name": "tolls_amount",
-						"type": "UTF8"
-					},
-					{
-						"name": "total_amount",
-						"type": "UTF8"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/AzureDataLakeStorage1')]"
-			]
+			"dependsOn": []
 		}
 	]
 }
