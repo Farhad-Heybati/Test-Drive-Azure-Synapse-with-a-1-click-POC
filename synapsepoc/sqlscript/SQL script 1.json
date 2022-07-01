@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "CREATE USER [demo-hr-v2] FROM EXTERNAL PROVIDER\nGO\nEXEC sp_addrolemember 'db_datareader', [demo-hr-v2]\nGO\nALTER ROLE db_datareader ADD MEMBER [demo-hr-v2];",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "DataExplorationDB",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
